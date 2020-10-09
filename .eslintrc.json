@@ -5,6 +5,8 @@
   },
   "rules": {
     "@typescript-eslint/consistent-type-definitions": "off",
-    "@typescript-eslint/stric-boolean-expressions": "off"
+    "@typescript-eslint/stric-boolean-expressions": "off",
+    "space-before-function-paren": "off",
+    "@typescript-eslint/camelcase": "off"
   }
 }

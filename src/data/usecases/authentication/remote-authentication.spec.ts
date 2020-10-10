@@ -4,6 +4,7 @@ import { mockAuthentication } from '@/domain/test/mock-authentication'
 import { InvalidCredentialsError } from '@/domain/errors/invalid-credentials-error'
 import { HttpStatusCode } from '@/data/protocols/http/http-response'
 import faker from 'faker'
+import { UnexpectedError } from '@/domain/errors/unexpectd-credentials-error'
 
 type SystemUnderTest = {
   systemUnderTest: RemoteAuthentication
@@ -41,5 +42,32 @@ describe('RemoteAuthentication', () => {
     }
     const promise = systemUnderTest.auth(mockAuthentication())
     await expect(promise).rejects.toThrow(new InvalidCredentialsError())
+  })
+
+  test('Should throw UnexpectedError if HttpPostClient returns 400', async () => {
+    const { systemUnderTest, httpPostClientSpy } = makeSystemUnderTest()
+    httpPostClientSpy.response = {
+      statusCode: HttpStatusCode.badRequest
+    }
+    const promise = systemUnderTest.auth(mockAuthentication())
+    await expect(promise).rejects.toThrow(new UnexpectedError())
+  })
+
+  test('Should throw UnexpectedError if HttpPostClient returns 404', async () => {
+    const { systemUnderTest, httpPostClientSpy } = makeSystemUnderTest()
+    httpPostClientSpy.response = {
+      statusCode: HttpStatusCode.notFound
+    }
+    const promise = systemUnderTest.auth(mockAuthentication())
+    await expect(promise).rejects.toThrow(new UnexpectedError())
+  })
+
+  test('Should throw UnexpectedError if HttpPostClient returns 500', async () => {
+    const { systemUnderTest, httpPostClientSpy } = makeSystemUnderTest()
+    httpPostClientSpy.response = {
+      statusCode: HttpStatusCode.serverError
+    }
+    const promise = systemUnderTest.auth(mockAuthentication())
+    await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 })

@@ -1,39 +1,33 @@
 import { AxiosHttpClient } from './axios-http-client'
-import { HttpPostParams } from '@/data/protocols/http'
+import { mockAxios } from '@/infra/test'
+import { mockPostRequest } from '@/data/test/index'
 import axios from 'axios'
-import faker from 'faker'
 
 jest.mock('axios')
-const mockedAxios = axios as jest.Mocked<typeof axios>
-const mockedAxiosResult = {
-  data: faker.random.objectElement(),
-  status: faker.random.number
+type SystemUnderTestTypes = {
+  systemUnderTest: AxiosHttpClient
+  mockedAxios: jest.Mocked<typeof axios>
 }
-mockedAxios.post.mockResolvedValue(mockedAxiosResult)
-
-const makeSystemUnderTest = (): AxiosHttpClient => {
-  return new AxiosHttpClient()
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
+  const systemUnderTest = new AxiosHttpClient()
+  const mockedAxios = mockAxios()
+  return {
+    systemUnderTest,
+    mockedAxios
+  }
 }
-
-const mockPostRequest = (): HttpPostParams<any> => ({
-  url: faker.internet.url(),
-  body: faker.random.objectElement()
-})
 
 describe('AxiosHttpClient', () => {
   test('Should call axios with correct values', async () => {
     const request = mockPostRequest()
-    const systemUnderTest = makeSystemUnderTest()
+    const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
     await systemUnderTest.post(request)
     expect(mockedAxios.post).toHaveBeenCalledWith(request.url, request.body)
   })
 
-  test('Should return the correct status code and the body', async () => {
-    const systemUnderTest = makeSystemUnderTest()
-    const httpResponse = await systemUnderTest.post(mockPostRequest())
-    expect(httpResponse).toEqual({
-      statusCode: mockedAxiosResult.status,
-      body: mockedAxiosResult.data
-    })
+  test('Should return the correct status code and the body', () => {
+    const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
+    const promise = systemUnderTest.post(mockPostRequest())
+    expect(promise).toEqual(mockedAxios.post.mock.results[0].value)
   })
 })

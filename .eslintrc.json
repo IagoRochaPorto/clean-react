@@ -11,12 +11,13 @@
   },
   "rules": {
     "@typescript-eslint/consistent-type-definitions": "off",
-    "@typescript-eslint/stric-boolean-expressions": "off",
+    "@typescript-eslint/stric-boolean-expressions": ["warning", { "allowAny": true, "ignoreRhs": true }],
     "space-before-function-paren": "off",
     "@typescript-eslint/camelcase": "off",
     "no-unused-vars": 0,
     "@typescript-eslint/no-unused-vars": ["off"],
     "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error"
-  }
+    "react/jsx-uses-vars": "error",
+    
+  },
 }

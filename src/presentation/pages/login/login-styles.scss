@@ -1,3 +1,131 @@
+@import '../../styles/colors';
+
+* {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: $background;
+}
+
+input[type='password'],
+input[type='email'] {
+  border: 1px solid $primary-light;
+  line-height: 40px;
+  border-radius: 4px;
+
+  &:focus {
+    outline-color: $primary-light;
+  }
+}
+
+button {
+  background: $primary-light;
+  color: $white;
+  border-radius: 8px;
+  font-size: 16px;
+  border: none;
+  line-height: 60px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
 .login {
-  background: red;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    border-top: 48px solid $primary-dark;
+    background: $primary;
+    align-items: center;
+    img {
+      margin-top: 48px;
+    }
+    h1 {
+      color: $white;
+      margin: 16px 0px 48px;
+    }
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    background: $white;
+    padding: 20px 40px 40px;
+    border-radius: 8px;
+    align-self: center;
+    box-shadow: 0 1px 3px -1px $black;
+
+    h2 {
+      color: $primary-dark;
+      text-align: center;
+      font-size: 24px;
+      text-transform: uppercase;
+      margin: auto;
+    }
+
+    .inputWrapper {
+      margin-top: 16px;
+      display: flex;
+      position: relative;
+      align-items: center;
+      input {
+        flex-grow: 1;
+        padding: 0 40px 0 8px;
+      }
+      .status {
+        position: absolute;
+        right: 8px;
+        font-size: 12px;
+      }
+    }
+
+    .submit {
+      margin-top: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .spinner {
+        margin-top: 16px;
+      }
+    }
+
+    .link {
+      text-align: center;
+      color: $primary;
+      cursor: pointer;
+      text-transform: lowercase;
+      margin-top: 16px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .errorWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .error {
+        margin-top: 30px;
+        color: $primary-light;
+      }
+    }
+  }
+  .footer {
+    background: $primary;
+    height: 48px;
+  }
 }

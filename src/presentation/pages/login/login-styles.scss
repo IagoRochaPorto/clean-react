@@ -29,6 +29,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      &:disabled {
+        background: $disabled-background;
+        color: $disabled-color;
+        &:hover {
+          opacity: 1;
+          cursor: auto;
+        }
+      }
       .spinner {
         margin-top: 16px;
       }

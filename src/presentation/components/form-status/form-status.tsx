@@ -3,10 +3,10 @@ import Styles from './form-status-styles.scss'
 import Context from '@/presentation/contexts/form/form-context'
 
 const FormStatus: React.FC = () => {
-  const { errorMessage } = useContext(Context)
+  const { errorState } = useContext(Context)
   return (
     <div data-testid="error-wrapper" className={Styles.errorWrapper}>
-      {errorMessage && <span className={Styles.error}>{errorMessage}</span>}
+      {errorState.main && <span className={Styles.error}>{errorState.main}</span>}
     </div>
   )
 }

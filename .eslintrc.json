@@ -11,7 +11,7 @@
   },
   "rules": {
     "@typescript-eslint/consistent-type-definitions": "off",
-    "@typescript-eslint/stric-boolean-expressions": [1, { "allowAny": true, "ignoreRhs": true }],
+    "@typescript-eslint/stric-boolean-expressions": [ { "allowAny": true, "ignoreRhs": true }],
     "space-before-function-paren": "off",
     "@typescript-eslint/camelcase": "off",
     "no-unused-vars": 0,

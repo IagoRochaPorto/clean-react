@@ -55,4 +55,14 @@ describe('Login component', () => {
       email
     })
   })
+
+  test('Should call validation with correct password', () => {
+    const password = faker.internet.password()
+    const { systemUnderTest, validationSpy } = makeSystemUnderTest()
+    const passwordInput = systemUnderTest.getByTestId('password')
+    fireEvent.input(passwordInput, { target: { value: password } })
+    expect(validationSpy.input).toEqual({
+      password
+    })
+  })
 })

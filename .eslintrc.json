@@ -11,7 +11,7 @@
   },
   "rules": {
     "@typescript-eslint/consistent-type-definitions": "off",
-    "@typescript-eslint/stric-boolean-expressions": 0,
+    "@typescript-eslint/strict-boolean-expressions": 0,
     "space-before-function-paren": "off",
     "@typescript-eslint/camelcase": "off",
     "no-unused-vars": 0,

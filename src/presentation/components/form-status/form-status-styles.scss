@@ -1,0 +1,12 @@
+@import '../../styles/colors';
+
+.errorWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .error {
+    margin-top: 30px;
+    color: $primary-light;
+  }
+}

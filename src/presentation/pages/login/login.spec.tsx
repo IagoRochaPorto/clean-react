@@ -1,21 +1,32 @@
 import React from 'react'
-import { render } from '@testing-library/react'
+import { render, RenderResult } from '@testing-library/react'
 import Login from './login'
+
+type SystemUnderTestTypes = {
+  systemUnderTest: RenderResult
+}
+
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
+  const systemUnderTest = render(<Login />)
+  return {
+    systemUnderTest
+  }
+}
 
 describe('Login component', () => {
   test('Should start with initial state', () => {
-    const { getByTestId } = render(<Login />)
-    const errorWrapper = getByTestId('error-wrapper')
+    const { systemUnderTest } = makeSystemUnderTest()
+    const errorWrapper = systemUnderTest.getByTestId('error-wrapper')
     expect(errorWrapper.childElementCount).toBe(0)
 
-    const submitButton = getByTestId('submit') as HTMLButtonElement
+    const submitButton = systemUnderTest.getByTestId('submit') as HTMLButtonElement
     expect(submitButton.disabled).toBe(true)
 
-    const emailStatus = getByTestId('email')
+    const emailStatus = systemUnderTest.getByTestId('email')
     expect(emailStatus.title).toBe('Campo obrigatório')
     expect(emailStatus.textContent).toBe('🔴')
 
-    const passwordStatus = getByTestId('password')
+    const passwordStatus = systemUnderTest.getByTestId('password')
     expect(passwordStatus.title).toBe('Campo obrigatório')
     expect(passwordStatus.textContent).toBe('🔴')
   })

@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, RenderResult, fireEvent, cleanup } from '@testing-library/react'
 import Login from './login'
-import faker from 'faker'
+import faker, { system } from 'faker'
 import { ValidationSpy } from '@/presentation/test'
 
 type SystemUnderTestTypes = {
@@ -11,6 +11,7 @@ type SystemUnderTestTypes = {
 
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const validationSpy = new ValidationSpy()
+  validationSpy.errorMessage = faker.random.words()
   const systemUnderTest = render(<Login validation={validationSpy} />)
   return {
     systemUnderTest,
@@ -21,7 +22,7 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
 describe('Login component', () => {
   afterEach(cleanup)
   test('Should start with initial state', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    const { systemUnderTest, validationSpy } = makeSystemUnderTest()
     const errorWrapper = systemUnderTest.getByTestId('error-wrapper')
     expect(errorWrapper.childElementCount).toBe(0)
 
@@ -29,7 +30,7 @@ describe('Login component', () => {
     expect(submitButton.disabled).toBe(true)
 
     const emailStatus = systemUnderTest.getByTestId('email-status')
-    expect(emailStatus.title).toBe('Campo obrigatório')
+    expect(emailStatus.title).toBe(validationSpy.errorMessage)
     expect(emailStatus.textContent).toBe('🔴')
 
     const passwordStatus = systemUnderTest.getByTestId('password-status')
@@ -53,5 +54,15 @@ describe('Login component', () => {
     fireEvent.input(passwordInput, { target: { value: password } })
     expect(validationSpy.fieldName).toBe('password')
     expect(validationSpy.fieldValue).toBe(password)
+  })
+
+  test('Should show email error if Validation fails', () => {
+    const { systemUnderTest, validationSpy } = makeSystemUnderTest()
+
+    const emailInput = systemUnderTest.getByTestId('email')
+    fireEvent.input(emailInput, { target: { value: faker.internet.email() } })
+    const emailStatus = systemUnderTest.getByTestId('email-status')
+    expect(emailStatus.title).toBe(validationSpy.errorMessage)
+    expect(emailStatus.textContent).toBe('🔴')
   })
 })

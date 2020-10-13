@@ -1,11 +1,24 @@
 import React from 'react'
+import faker from 'faker'
 import { render, RenderResult, fireEvent, cleanup } from '@testing-library/react'
 import Login from './login'
-import faker, { system } from 'faker'
 import { ValidationStub } from '@/presentation/test'
+import { Authentication, AuthenticationParams } from '@/domain/usecases'
+import { AccountModel } from '@/domain/models'
+import { mockAccountModel } from '@/domain/test'
+
+class AuthenticationSpy implements Authentication {
+  account = mockAccountModel()
+  params: AuthenticationParams
+  async auth(params: AuthenticationParams): Promise<AccountModel> {
+    this.params = params
+    return Promise.resolve(this.account)
+  }
+}
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
+  authenticationSpy: AuthenticationSpy
 }
 
 type SystemUnderTestParams = {
@@ -14,10 +27,12 @@ type SystemUnderTestParams = {
 
 const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTypes => {
   const validationStub = new ValidationStub()
+  const authenticationSpy = new AuthenticationSpy()
   validationStub.errorMessage = params?.validationError || ''
-  const systemUnderTest = render(<Login validation={validationStub} />)
+  const systemUnderTest = render(<Login validation={validationStub} authentication={authenticationSpy} />)
   return {
-    systemUnderTest
+    systemUnderTest,
+    authenticationSpy
   }
 }
 
@@ -111,5 +126,20 @@ describe('Login component', () => {
     const spinner = systemUnderTest.getByTestId('spinner')
     expect(spinner).toBeTruthy()
     expect(submitButton.disabled).toBe(true)
+  })
+
+  test('Should call Authentication with correct values', () => {
+    const { systemUnderTest, authenticationSpy } = makeSystemUnderTest()
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+    const emailInput = systemUnderTest.getByTestId('email')
+    fireEvent.input(emailInput, { target: { value: email } })
+
+    const passwordInput = systemUnderTest.getByTestId('password')
+    fireEvent.input(passwordInput, { target: { value: password } })
+
+    const submitButton = systemUnderTest.getByTestId('submit') as HTMLButtonElement
+    fireEvent.click(submitButton)
+    expect(authenticationSpy.params).toEqual({ email, password })
   })
 })

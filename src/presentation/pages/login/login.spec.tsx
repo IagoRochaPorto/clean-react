@@ -77,4 +77,18 @@ describe('Login component', () => {
     expect(passwordStatus.title).toBe('Deu certo!')
     expect(passwordStatus.textContent).toBe('🔵')
   })
+
+  test('Should enable submit button if form is valid', () => {
+    const { systemUnderTest, validationStub } = makeSystemUnderTest()
+    validationStub.errorMessage = ''
+
+    const emailInput = systemUnderTest.getByTestId('email')
+    fireEvent.input(emailInput, { target: { value: faker.internet.email() } })
+
+    const passwordInput = systemUnderTest.getByTestId('password')
+    fireEvent.input(passwordInput, { target: { value: faker.internet.password() } })
+
+    const submitButton = systemUnderTest.getByTestId('submit') as HTMLButtonElement
+    expect(submitButton.disabled).toBe(false)
+  })
 })

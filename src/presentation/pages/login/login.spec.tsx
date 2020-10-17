@@ -1,8 +1,9 @@
 import React from 'react'
 import faker, { system } from 'faker'
-import { render, RenderResult, fireEvent, cleanup } from '@testing-library/react'
+import { render, RenderResult, fireEvent, cleanup, waitFor } from '@testing-library/react'
 import Login from './login'
 import { ValidationStub, AuthenticationSpy } from '@/presentation/test'
+import { InvalidCredentialsError } from '@/domain/errors'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
@@ -141,5 +142,18 @@ describe('Login component', () => {
     fireEvent.submit(systemUnderTest.getByTestId('form'))
 
     expect(authenticationSpy.callsCount).toBe(0)
+  })
+
+  test('Should present error if Authentication fails', async () => {
+    const { systemUnderTest, authenticationSpy } = makeSystemUnderTest()
+    const error = new InvalidCredentialsError()
+    jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
+    simulateValidSubmit(systemUnderTest)
+    const errorWrapper = systemUnderTest.getByTestId('error-wrapper')
+    const submit = systemUnderTest.getByTestId('submit')
+    await waitFor(() => errorWrapper)
+    const mainError = systemUnderTest.getByTestId('main-error')
+    expect(mainError.textContent).toBe(error.message)
+    expect(submit.childElementCount).toBe(1)
   })
 })

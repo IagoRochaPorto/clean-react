@@ -17,7 +17,7 @@ type SystemUnderTestParams = {
   validationError: string
 }
 
-const history = createMemoryHistory()
+const history = createMemoryHistory({ initialEntries: ['/login'] })
 
 const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTypes => {
   const validationStub = new ValidationStub()
@@ -172,6 +172,8 @@ describe('Login component', () => {
     simulateValidSubmit(systemUnderTest)
     await waitFor(() => systemUnderTest.getByTestId('form'))
     expect(localStorage.setItem).toHaveBeenCalledWith('accessToken', authenticationSpy.account.accessToken)
+    expect(history.length).toBe(1)
+    expect(history.location.pathname).toBe('/')
   })
 
   test('Should go to signup page', () => {

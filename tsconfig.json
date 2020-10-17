@@ -14,7 +14,7 @@
     "allowJs": true,
     "resolveJsonModule": true,
     "isolatedModules": false,
-    "strictNullChecks": true
+    "strictNullChecks": false
   },
   "include": ["src"]
 }

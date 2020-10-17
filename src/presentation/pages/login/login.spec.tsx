@@ -1,4 +1,6 @@
 import React from 'react'
+import { Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 import faker from 'faker'
 import 'jest-localstorage-mock'
 import { render, RenderResult, fireEvent, cleanup, waitFor } from '@testing-library/react'
@@ -15,11 +17,17 @@ type SystemUnderTestParams = {
   validationError: string
 }
 
+const history = createMemoryHistory()
+
 const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTypes => {
   const validationStub = new ValidationStub()
   const authenticationSpy = new AuthenticationSpy()
   validationStub.errorMessage = params?.validationError || ''
-  const systemUnderTest = render(<Login validation={validationStub} authentication={authenticationSpy} />)
+  const systemUnderTest = render(
+    <Router history={history}>
+      <Login validation={validationStub} authentication={authenticationSpy} />
+    </Router>
+  )
   return {
     systemUnderTest,
     authenticationSpy
@@ -164,5 +172,13 @@ describe('Login component', () => {
     simulateValidSubmit(systemUnderTest)
     await waitFor(() => systemUnderTest.getByTestId('form'))
     expect(localStorage.setItem).toHaveBeenCalledWith('accessToken', authenticationSpy.account.accessToken)
+  })
+
+  test('Should go to signup page', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const register = systemUnderTest.getByTestId('signup')
+    fireEvent.click(register)
+    expect(history.length).toBe(2)
+    expect(history.location.pathname).toBe('/signup')
   })
 })

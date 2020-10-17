@@ -16,4 +16,10 @@ describe('EmailValidation', () => {
     const error = systemUnderTest.validate(faker.internet.email())
     expect(error).toBeFalsy()
   })
+
+  test('Should return falsy if email is empty', () => {
+    const systemUnderTest = makeSystemUnderTest()
+    const error = systemUnderTest.validate('')
+    expect(error).toBeFalsy()
+  })
 })

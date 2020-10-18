@@ -8,7 +8,7 @@ type SystemUnderTest = {
 
 const makeSystemUnderSystem = (fieldName: string): SystemUnderTest => {
   const fieldValidationsSpy = [new FieldValidationSpy(fieldName), new FieldValidationSpy(fieldName)]
-  const systemUnderTest = new ValidationComposite(fieldValidationsSpy)
+  const systemUnderTest = ValidationComposite.build(fieldValidationsSpy)
   return {
     systemUnderTest,
     fieldValidationsSpy

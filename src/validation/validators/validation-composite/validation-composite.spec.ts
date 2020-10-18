@@ -1,15 +1,13 @@
-import { Validation } from '@/presentation/protocols/validation'
-import { FieldValidation } from '@/validation/protocols/field-validation'
 import { FieldValidationSpy } from '../test/mock-field-validation'
 import { ValidationComposite } from './validation-composite'
-
+import faker from 'faker'
 type SystemUnderTest = {
   systemUnderTest: ValidationComposite
   fieldValidationsSpy: FieldValidationSpy[]
 }
 
-const makeSystemUnderSystem = (): SystemUnderTest => {
-  const fieldValidationsSpy = [new FieldValidationSpy('any_field'), new FieldValidationSpy('any_field')]
+const makeSystemUnderSystem = (fieldName: string): SystemUnderTest => {
+  const fieldValidationsSpy = [new FieldValidationSpy(fieldName), new FieldValidationSpy(fieldName)]
   const systemUnderTest = new ValidationComposite(fieldValidationsSpy)
   return {
     systemUnderTest,
@@ -19,10 +17,20 @@ const makeSystemUnderSystem = (): SystemUnderTest => {
 
 describe('ValidationComposite', () => {
   test('Should return error if any validation fails', () => {
-    const { systemUnderTest, fieldValidationsSpy } = makeSystemUnderSystem()
-    fieldValidationsSpy[0].error = new Error('first_error')
-    fieldValidationsSpy[1].error = new Error('second_error')
-    const error = systemUnderTest.validate('any_field', 'any_value')
-    expect(error).toBe('first_error')
+    const fieldName = faker.database.column()
+    const { systemUnderTest, fieldValidationsSpy } = makeSystemUnderSystem(fieldName)
+    const errorMessage = faker.random.words()
+    fieldValidationsSpy[0].error = new Error(errorMessage)
+    fieldValidationsSpy[1].error = new Error(faker.random.words())
+    const error = systemUnderTest.validate(fieldName, faker.random.word())
+    expect(error).toBe(errorMessage)
+  })
+
+  test('Should return falsy if none validation fails', () => {
+    const fieldName = faker.database.column()
+
+    const { systemUnderTest } = makeSystemUnderSystem(fieldName)
+    const error = systemUnderTest.validate(fieldName, 'any_value')
+    expect(error).toBeFalsy()
   })
 })

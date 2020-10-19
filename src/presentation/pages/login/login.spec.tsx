@@ -2,15 +2,15 @@ import React from 'react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import faker from 'faker'
-import 'jest-localstorage-mock'
 import { render, RenderResult, fireEvent, cleanup, waitFor, wait } from '@testing-library/react'
 import { Login } from '@/presentation/pages'
-import { ValidationStub, AuthenticationSpy } from '@/presentation/test'
+import { ValidationStub, AuthenticationSpy, SaveAcessTokenMock } from '@/presentation/test'
 import { InvalidCredentialsError } from '@/domain/errors'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
   authenticationSpy: AuthenticationSpy
+  saveAccessTokenMock: SaveAcessTokenMock
 }
 
 type SystemUnderTestParams = {
@@ -22,15 +22,17 @@ const history = createMemoryHistory({ initialEntries: ['/login'] })
 const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTypes => {
   const validationStub = new ValidationStub()
   const authenticationSpy = new AuthenticationSpy()
+  const saveAccessTokenMock = new SaveAcessTokenMock()
   validationStub.errorMessage = params?.validationError || ''
   const systemUnderTest = render(
     <Router history={history}>
-      <Login validation={validationStub} authentication={authenticationSpy} />
+      <Login validation={validationStub} authentication={authenticationSpy} saveAccessToken={saveAccessTokenMock} />
     </Router>
   )
   return {
     systemUnderTest,
-    authenticationSpy
+    authenticationSpy,
+    saveAccessTokenMock
   }
 }
 
@@ -85,7 +87,6 @@ const testButtonIsDisabled = (systemUnderTest: RenderResult, fieldName: string, 
 
 describe('Login component', () => {
   afterEach(cleanup)
-  beforeEach(() => localStorage.clear())
   test('Should start with initial state', () => {
     const validationError = faker.random.words()
     const { systemUnderTest } = makeSystemUnderTest({ validationError })
@@ -177,12 +178,10 @@ describe('Login component', () => {
     testErrorWraperChildCount(systemUnderTest, 1)
   })
 
-  test('Should add accessToken to localstorage on success', async () => {
-    const { systemUnderTest, authenticationSpy } = makeSystemUnderTest()
+  test('Should call saveAccessToken on success', async () => {
+    const { systemUnderTest, authenticationSpy, saveAccessTokenMock } = makeSystemUnderTest()
     await simulateValidSubmit(systemUnderTest)
-    expect(localStorage.setItem).toHaveBeenCalledWith('accessToken', authenticationSpy.account.accessToken)
-    expect(history.length).toBe(1)
-    expect(history.location.pathname).toBe('/')
+    expect(saveAccessTokenMock.accesstoken).toBe(authenticationSpy.account.accessToken)
   })
 
   test('Should go to signup page', () => {

@@ -184,6 +184,15 @@ describe('Login component', () => {
     expect(saveAccessTokenMock.accesstoken).toBe(authenticationSpy.account.accessToken)
   })
 
+  test('Should present error if SaveAccessToken fails', async () => {
+    const { systemUnderTest, saveAccessTokenMock } = makeSystemUnderTest()
+    const error = new InvalidCredentialsError()
+    jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
+    await simulateValidSubmit(systemUnderTest)
+    testElementText(systemUnderTest, 'main-error', error.message)
+    testErrorWraperChildCount(systemUnderTest, 1)
+  })
+
   test('Should go to signup page', () => {
     const { systemUnderTest } = makeSystemUnderTest()
     const register = systemUnderTest.getByTestId('signup')

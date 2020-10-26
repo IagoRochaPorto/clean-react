@@ -1,0 +1,57 @@
+@import '../../styles/colors';
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    background: $white;
+    padding: 20px 40px 40px;
+    border-radius: 8px;
+    align-self: center;
+    box-shadow: 0 1px 3px -1px $black;
+
+    h2 {
+      color: $primary-dark;
+      text-align: center;
+      font-size: 24px;
+      text-transform: uppercase;
+      margin: auto;
+    }
+
+    .submit {
+      margin-top: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:disabled {
+        background: $disabled-background;
+        color: $disabled-color;
+        &:hover {
+          opacity: 1;
+          cursor: auto;
+        }
+      }
+      .spinner {
+        margin-top: 16px;
+      }
+    }
+
+    .link {
+      text-align: center;
+      color: $primary;
+      cursor: pointer;
+      text-transform: lowercase;
+      margin-top: 16px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

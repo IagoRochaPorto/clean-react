@@ -25,4 +25,11 @@ describe('RemoteAuthentication', () => {
     await systemUnderTest.add(mockAddAccountParams())
     expect(httpPostClientSpy.url).toBe(url)
   })
+
+  test('Should call HttpPostClient with correct body', async () => {
+    const { systemUnderTest, httpPostClientSpy } = makeSystemUnderTest()
+    const addAccountParams = mockAddAccountParams()
+    await systemUnderTest.add(addAccountParams)
+    expect(httpPostClientSpy.body).toEqual(addAccountParams)
+  })
 })

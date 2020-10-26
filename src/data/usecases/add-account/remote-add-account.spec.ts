@@ -52,4 +52,13 @@ describe('RemoteAuthentication', () => {
     const promise = systemUnderTest.add(mockAddAccountParams())
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
+
+  test('Should throw UnexpectedError if HttpPostClient returns 404', async () => {
+    const { systemUnderTest, httpPostClientSpy } = makeSystemUnderTest()
+    httpPostClientSpy.response = {
+      statusCode: HttpStatusCode.notFound
+    }
+    const promise = systemUnderTest.add(mockAddAccountParams())
+    await expect(promise).rejects.toThrow(new UnexpectedError())
+  })
 })

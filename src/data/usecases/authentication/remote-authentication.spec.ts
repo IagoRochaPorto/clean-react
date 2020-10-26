@@ -7,12 +7,12 @@ import { AuthenticationParams } from '@/domain/usecases'
 import { AccountModel } from '@/domain/models'
 import faker from 'faker'
 
-type SystemUnderTest = {
+type SystemUnderTestTypes = {
   systemUnderTest: RemoteAuthentication
   httpPostClientSpy: HttpPostClientSpy<AuthenticationParams, AccountModel>
 }
 
-const makeSystemUnderTest = (url: string = faker.internet.url()): SystemUnderTest => {
+const makeSystemUnderTest = (url: string = faker.internet.url()): SystemUnderTestTypes => {
   const httpPostClientSpy = new HttpPostClientSpy<AuthenticationParams, AccountModel>()
   const systemUnderTest = new RemoteAuthentication(url, httpPostClientSpy)
   return {

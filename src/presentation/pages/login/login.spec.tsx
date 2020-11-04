@@ -146,6 +146,7 @@ describe('Login component', () => {
     const { systemUnderTest, authenticationSpy, saveAccessTokenMock } = makeSystemUnderTest()
     await simulateValidSubmit(systemUnderTest)
     expect(saveAccessTokenMock.accesstoken).toBe(authenticationSpy.account.accessToken)
+    expect(history.location.pathname).toBe('/')
   })
 
   test('Should present error if SaveAccessToken fails', async () => {

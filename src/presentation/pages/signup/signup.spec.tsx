@@ -1,28 +1,38 @@
 import React from 'react'
 import faker from 'faker'
+import { Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 import { RenderResult, render, cleanup, fireEvent, waitFor } from '@testing-library/react'
 import SignUp from './signup'
-import { AddAccountSpy, Helper, ValidationStub } from '@/presentation/test'
+import { AddAccountSpy, Helper, SaveAcessTokenMock, ValidationStub } from '@/presentation/test'
 import { EmailInUseError } from '@/domain/errors'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
   addAccountSpy: AddAccountSpy
+  saveAccessToken: SaveAcessTokenMock
 }
 
 type SystemUnderTestParams = {
   validationError: string
 }
 
+const history = createMemoryHistory({ initialEntries: ['/signup'] })
+
 const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTypes => {
   const validationStub = new ValidationStub()
   validationStub.errorMessage = params?.validationError || ''
   const addAccountSpy = new AddAccountSpy()
-
-  const systemUnderTest = render(<SignUp validation={validationStub} addAccount={addAccountSpy} />)
+  const saveAccessToken = new SaveAcessTokenMock()
+  const systemUnderTest = render(
+    <Router history={history}>
+      <SignUp validation={validationStub} addAccount={addAccountSpy} saveAccessToken={saveAccessToken} />
+    </Router>
+  )
   return {
     systemUnderTest,
-    addAccountSpy
+    addAccountSpy,
+    saveAccessToken
   }
 }
 
@@ -169,5 +179,12 @@ describe('Signup component', () => {
     await simulateValidSubmit(systemUnderTest)
     Helper.testElementText(systemUnderTest, 'main-error', error.message)
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
+  })
+
+  test('Should call saveAccessToken on success', async () => {
+    const { systemUnderTest, addAccountSpy, saveAccessToken } = makeSystemUnderTest()
+    await simulateValidSubmit(systemUnderTest)
+    expect(saveAccessToken.accesstoken).toBe(addAccountSpy.account.accessToken)
+    expect(history.location.pathname).toBe('/')
   })
 })

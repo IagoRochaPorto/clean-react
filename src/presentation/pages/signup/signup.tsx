@@ -4,7 +4,7 @@ import { LoginHeader, Footer, Input, FormStatus, Spinner } from '@/presentation/
 import Context from '@/presentation/contexts/form/form-context'
 import { Validation } from '@/presentation/protocols/validation'
 import { AddAccount, SaveAccessToken } from '@/domain/usecases'
-import { useHistory } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 type Props = {
   validation: Validation
@@ -88,9 +88,9 @@ const Signup: React.FC<Props> = ({ validation, addAccount, saveAccessToken }: Pr
             {state.isLoading && <Spinner className={Styles.spinner} />}
             {!state.isLoading && <span>Criar conta</span>}
           </button>
-          <span data-testid="/login" className={Styles.link}>
+          <Link data-testid="loginLink" replace to="/login" className={Styles.link}>
             Voltar para login
-          </span>
+          </Link>
           <FormStatus />
         </form>
       </Context.Provider>

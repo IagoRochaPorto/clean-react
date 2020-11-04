@@ -33,7 +33,7 @@ describe('Signup component', () => {
     Helper.testStatusForField(systemUnderTest, 'name', validationError)
     Helper.testStatusForField(systemUnderTest, 'email', validationError)
     Helper.testStatusForField(systemUnderTest, 'password', validationError)
-    Helper.testStatusForField(systemUnderTest, 'passwordConfirmation', 'Campo obrigatório')
+    Helper.testStatusForField(systemUnderTest, 'passwordConfirmation', validationError)
   })
 
   test('Should show name error if Validation fails', () => {
@@ -58,5 +58,13 @@ describe('Signup component', () => {
 
     Helper.populateField(systemUnderTest, 'password')
     Helper.testStatusForField(systemUnderTest, 'password', validationError)
+  })
+
+  test('Should show passwordConfirmation error if Validation fails', () => {
+    const validationError = faker.random.words()
+    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+
+    Helper.populateField(systemUnderTest, 'passwordConfirmation')
+    Helper.testStatusForField(systemUnderTest, 'passwordConfirmation', validationError)
   })
 })

@@ -30,3 +30,8 @@ export const testElementExists = (systemUnderTest: RenderResult, fieldName: stri
   const el = systemUnderTest.getByTestId(fieldName)
   expect(el).toBeTruthy()
 }
+
+export const testElementText = (systemUnderTest: RenderResult, fieldName: string, text: string): void => {
+  const el = systemUnderTest.getByTestId(fieldName)
+  expect(el.textContent).toBe(text)
+}

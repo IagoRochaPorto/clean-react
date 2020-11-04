@@ -49,11 +49,6 @@ const simulateValidSubmit = async (
   await waitFor(() => form)
 }
 
-const testElementText = (systemUnderTest: RenderResult, fieldName: string, text: string): void => {
-  const el = systemUnderTest.getByTestId(fieldName)
-  expect(el.textContent).toBe(text)
-}
-
 describe('Login component', () => {
   afterEach(cleanup)
   test('Should start with initial state', () => {
@@ -143,7 +138,7 @@ describe('Login component', () => {
     const error = new InvalidCredentialsError()
     jest.spyOn(authenticationSpy, 'auth').mockRejectedValueOnce(error)
     await simulateValidSubmit(systemUnderTest)
-    testElementText(systemUnderTest, 'main-error', error.message)
+    Helper.testElementText(systemUnderTest, 'main-error', error.message)
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
 
@@ -158,7 +153,7 @@ describe('Login component', () => {
     const error = new InvalidCredentialsError()
     jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(systemUnderTest)
-    testElementText(systemUnderTest, 'main-error', error.message)
+    Helper.testElementText(systemUnderTest, 'main-error', error.message)
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
 

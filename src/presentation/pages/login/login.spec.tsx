@@ -160,7 +160,7 @@ describe('Login component', () => {
 
   test('Should go to signup page', () => {
     const { systemUnderTest } = makeSystemUnderTest()
-    const register = systemUnderTest.getByTestId('signup')
+    const register = systemUnderTest.getByTestId('signupLink')
     fireEvent.click(register)
     expect(history.length).toBe(2)
     expect(history.location.pathname).toBe('/signup')

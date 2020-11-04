@@ -95,4 +95,15 @@ describe('Signup component', () => {
     Helper.populateField(systemUnderTest, 'passwordConfirmation')
     Helper.testStatusForField(systemUnderTest, 'passwordConfirmation')
   })
+
+  test('Should enable submit button if form is valid', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+
+    Helper.populateField(systemUnderTest, 'name')
+    Helper.populateField(systemUnderTest, 'email')
+    Helper.populateField(systemUnderTest, 'password')
+    Helper.populateField(systemUnderTest, 'passwordConfirmation')
+
+    Helper.testButtonIsDisabled(systemUnderTest, 'submit', false)
+  })
 })

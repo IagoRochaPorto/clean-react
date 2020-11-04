@@ -1,6 +1,6 @@
 import React from 'react'
 import faker from 'faker'
-import { RenderResult, render, cleanup } from '@testing-library/react'
+import { RenderResult, render, cleanup, fireEvent, waitFor } from '@testing-library/react'
 import SignUp from './signup'
 import { Helper, ValidationStub } from '@/presentation/test'
 
@@ -20,6 +20,22 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   return {
     systemUnderTest
   }
+}
+
+const simulateValidSubmit = async (
+  systemUnderTest: RenderResult,
+  name = faker.name.findName(),
+  email = faker.internet.email(),
+  password = faker.internet.password()
+): Promise<void> => {
+  Helper.populateField(systemUnderTest, 'name', name)
+  Helper.populateField(systemUnderTest, 'email', email)
+  Helper.populateField(systemUnderTest, 'password', password)
+  Helper.populateField(systemUnderTest, 'passwordConfirmation', password)
+
+  const form = systemUnderTest.getByTestId('form') as HTMLButtonElement
+  fireEvent.submit(form)
+  await waitFor(() => form)
 }
 
 describe('Signup component', () => {
@@ -105,5 +121,13 @@ describe('Signup component', () => {
     Helper.populateField(systemUnderTest, 'passwordConfirmation')
 
     Helper.testButtonIsDisabled(systemUnderTest, 'submit', false)
+  })
+
+  test('Should show spinner on submit', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    await simulateValidSubmit(systemUnderTest)
+
+    testElementExists(systemUnderTest, 'spinner')
+    Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
   })
 })

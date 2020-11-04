@@ -143,4 +143,12 @@ describe('Signup component', () => {
 
     expect(addAccountSpy.params).toEqual({ name, email, password, passwordConfirmation: password })
   })
+
+  test('Should call Authentication only once', async () => {
+    const { systemUnderTest, addAccountSpy } = makeSystemUnderTest()
+    await simulateValidSubmit(systemUnderTest)
+    await simulateValidSubmit(systemUnderTest)
+
+    expect(addAccountSpy.callsCount).toBe(1)
+  })
 })

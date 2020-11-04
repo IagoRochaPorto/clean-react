@@ -1,6 +1,6 @@
 import React from 'react'
 import faker from 'faker'
-import { RenderResult, render, cleanup, fireEvent } from '@testing-library/react'
+import { RenderResult, render, cleanup } from '@testing-library/react'
 import SignUp from './signup'
 import { Helper, ValidationStub } from '@/presentation/test'
 
@@ -22,11 +22,6 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   }
 }
 
-const populateField = (systemUnderTest: RenderResult, fieldName: string, value = faker.random.word()): void => {
-  const input = systemUnderTest.getByTestId(fieldName)
-  fireEvent.input(input, { target: { value } })
-}
-
 describe('Signup component', () => {
   afterEach(cleanup)
 
@@ -45,7 +40,7 @@ describe('Signup component', () => {
     const validationError = faker.random.words()
     const { systemUnderTest } = makeSystemUnderTest({ validationError })
 
-    populateField(systemUnderTest, 'name')
+    Helper.populateField(systemUnderTest, 'name')
     Helper.testStatusForField(systemUnderTest, 'name', validationError)
   })
 })

@@ -21,9 +21,9 @@ const history = createMemoryHistory({ initialEntries: ['/login'] })
 
 const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTypes => {
   const validationStub = new ValidationStub()
+  validationStub.errorMessage = params?.validationError || ''
   const authenticationSpy = new AuthenticationSpy()
   const saveAccessTokenMock = new SaveAcessTokenMock()
-  validationStub.errorMessage = params?.validationError || ''
   const systemUnderTest = render(
     <Router history={history}>
       <Login validation={validationStub} authentication={authenticationSpy} saveAccessToken={saveAccessTokenMock} />
@@ -41,22 +41,12 @@ const simulateValidSubmit = async (
   email = faker.internet.email(),
   password = faker.internet.password()
 ): Promise<void> => {
-  populateEmailField(systemUnderTest, email)
-  populatePasswordField(systemUnderTest, password)
+  Helper.populateField(systemUnderTest, 'email', email)
+  Helper.populateField(systemUnderTest, 'password', password)
 
   const form = systemUnderTest.getByTestId('form') as HTMLButtonElement
   fireEvent.submit(form)
   await waitFor(() => form)
-}
-
-const populateEmailField = (systemUnderTest: RenderResult, email = faker.internet.email()): void => {
-  const emailInput = systemUnderTest.getByTestId('email')
-  fireEvent.input(emailInput, { target: { value: email } })
-}
-
-const populatePasswordField = (systemUnderTest: RenderResult, password = faker.internet.password()): void => {
-  const passwordInput = systemUnderTest.getByTestId('password')
-  fireEvent.input(passwordInput, { target: { value: password } })
 }
 
 const testElementExists = (systemUnderTest: RenderResult, fieldName: string): void => {
@@ -85,7 +75,7 @@ describe('Login component', () => {
     const validationError = faker.random.words()
     const { systemUnderTest } = makeSystemUnderTest({ validationError })
 
-    populateEmailField(systemUnderTest)
+    Helper.populateField(systemUnderTest, 'email')
     Helper.testStatusForField(systemUnderTest, 'email', validationError)
   })
 
@@ -93,29 +83,29 @@ describe('Login component', () => {
     const validationError = faker.random.words()
     const { systemUnderTest } = makeSystemUnderTest({ validationError })
 
-    populatePasswordField(systemUnderTest)
+    Helper.populateField(systemUnderTest, 'password')
     Helper.testStatusForField(systemUnderTest, 'password', validationError)
   })
 
   test('Should show valid email state if Validation succeeds', () => {
     const { systemUnderTest } = makeSystemUnderTest()
 
-    populateEmailField(systemUnderTest)
+    Helper.populateField(systemUnderTest, 'email')
     Helper.testStatusForField(systemUnderTest, 'email')
   })
 
   test('Should show valid password state if Validation succeeds', () => {
     const { systemUnderTest } = makeSystemUnderTest()
 
-    populatePasswordField(systemUnderTest)
+    Helper.populateField(systemUnderTest, 'password')
     Helper.testStatusForField(systemUnderTest, 'password')
   })
 
   test('Should enable submit button if form is valid', () => {
     const { systemUnderTest } = makeSystemUnderTest()
 
-    populateEmailField(systemUnderTest)
-    populatePasswordField(systemUnderTest)
+    Helper.populateField(systemUnderTest, 'email')
+    Helper.populateField(systemUnderTest, 'password')
 
     Helper.testButtonIsDisabled(systemUnderTest, 'submit', false)
   })

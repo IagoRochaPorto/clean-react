@@ -196,4 +196,12 @@ describe('Signup component', () => {
     Helper.testElementText(systemUnderTest, 'main-error', error.message)
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
+
+  test('Should go to login page', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const loginLink = systemUnderTest.getByTestId('loginLink')
+    fireEvent.click(loginLink)
+    expect(history.length).toBe(1)
+    expect(history.location.pathname).toBe('/login')
+  })
 })

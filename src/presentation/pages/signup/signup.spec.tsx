@@ -31,7 +31,7 @@ describe('Signup component', () => {
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 0)
     Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
     Helper.testStatusForField(systemUnderTest, 'name', validationError)
-    Helper.testStatusForField(systemUnderTest, 'email', 'Campo obrigatório')
+    Helper.testStatusForField(systemUnderTest, 'email', validationError)
     Helper.testStatusForField(systemUnderTest, 'password', 'Campo obrigatório')
     Helper.testStatusForField(systemUnderTest, 'passwordConfirmation', 'Campo obrigatório')
   })
@@ -42,5 +42,13 @@ describe('Signup component', () => {
 
     Helper.populateField(systemUnderTest, 'name')
     Helper.testStatusForField(systemUnderTest, 'name', validationError)
+  })
+
+  test('Should show email error if Validation fails', () => {
+    const validationError = faker.random.words()
+    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+
+    Helper.populateField(systemUnderTest, 'email')
+    Helper.testStatusForField(systemUnderTest, 'email', validationError)
   })
 })

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Styles from './signup-styles.scss'
-import { LoginHeader, Footer, Input, FormStatus } from '@/presentation/components'
+import { LoginHeader, Footer, Input, FormStatus, Spinner } from '@/presentation/components'
 import Context from '@/presentation/contexts/form/form-context'
 import { Validation } from '@/presentation/protocols/validation'
 
@@ -32,11 +32,16 @@ const Signup: React.FC<Props> = ({ validation }: Props) => {
     })
   }, [state.name, state.email, state.password, state.passwordConfirmation])
 
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault()
+    setState({ ...state, isLoading: true })
+  }
+
   return (
     <div className={Styles.signup}>
       <LoginHeader />
       <Context.Provider value={{ state, setState }}>
-        <form className={Styles.form}>
+        <form data-testid="form" className={Styles.form} onSubmit={handleSubmit}>
           <h2>Login</h2>
           <Input type="text" name="name" placeholder="Digite seu nome" />
           <Input type="email" name="email" placeholder="Digite seu email" />
@@ -54,7 +59,8 @@ const Signup: React.FC<Props> = ({ validation }: Props) => {
             className={Styles.submit}
             type="submit"
           >
-            Criar conta
+            {state.isLoading && <Spinner className={Styles.spinner} />}
+            {!state.isLoading && <span>Criar conta</span>}
           </button>
           <span data-testid="/login" className={Styles.link}>
             Voltar para login

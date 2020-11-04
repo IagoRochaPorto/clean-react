@@ -4,7 +4,7 @@ import { createMemoryHistory } from 'history'
 import faker from 'faker'
 import { render, RenderResult, fireEvent, cleanup, waitFor, wait } from '@testing-library/react'
 import { Login } from '@/presentation/pages'
-import { ValidationStub, AuthenticationSpy, SaveAcessTokenMock } from '@/presentation/test'
+import { ValidationStub, AuthenticationSpy, SaveAcessTokenMock, Helper } from '@/presentation/test'
 import { InvalidCredentialsError } from '@/domain/errors'
 
 type SystemUnderTestTypes = {
@@ -59,17 +59,6 @@ const populatePasswordField = (systemUnderTest: RenderResult, password = faker.i
   fireEvent.input(passwordInput, { target: { value: password } })
 }
 
-const testStatusForField = (systemUnderTest: RenderResult, fieldName: string, validationError?: string): void => {
-  const emailStatus = systemUnderTest.getByTestId(`${fieldName}-status`)
-  expect(emailStatus.title).toBe(validationError || 'Deu certo!')
-  testElementText(systemUnderTest, `${fieldName}-status`, validationError ? '🔴' : '🔵')
-}
-
-const testErrorWraperChildCount = (systemUnderTest: RenderResult, count: number): void => {
-  const errorWrapper = systemUnderTest.getByTestId('error-wrapper')
-  expect(errorWrapper.childElementCount).toBe(count)
-}
-
 const testElementExists = (systemUnderTest: RenderResult, fieldName: string): void => {
   const el = systemUnderTest.getByTestId(fieldName)
   expect(el).toBeTruthy()
@@ -80,21 +69,16 @@ const testElementText = (systemUnderTest: RenderResult, fieldName: string, text:
   expect(el.textContent).toBe(text)
 }
 
-const testButtonIsDisabled = (systemUnderTest: RenderResult, fieldName: string, isDisabled: boolean): void => {
-  const button = systemUnderTest.getByTestId(fieldName) as HTMLButtonElement
-  expect(button.disabled).toBe(isDisabled)
-}
-
 describe('Login component', () => {
   afterEach(cleanup)
   test('Should start with initial state', () => {
     const validationError = faker.random.words()
     const { systemUnderTest } = makeSystemUnderTest({ validationError })
 
-    testErrorWraperChildCount(systemUnderTest, 0)
-    testButtonIsDisabled(systemUnderTest, 'submit', true)
-    testStatusForField(systemUnderTest, 'email', validationError)
-    testStatusForField(systemUnderTest, 'password', validationError)
+    Helper.testChildCount(systemUnderTest, 'error-wrapper', 0)
+    Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
+    Helper.testStatusForField(systemUnderTest, 'email', validationError)
+    Helper.testStatusForField(systemUnderTest, 'password', validationError)
   })
 
   test('Should show email error if Validation fails', () => {
@@ -102,7 +86,7 @@ describe('Login component', () => {
     const { systemUnderTest } = makeSystemUnderTest({ validationError })
 
     populateEmailField(systemUnderTest)
-    testStatusForField(systemUnderTest, 'email', validationError)
+    Helper.testStatusForField(systemUnderTest, 'email', validationError)
   })
 
   test('Should show password error if Validation fails', () => {
@@ -110,21 +94,21 @@ describe('Login component', () => {
     const { systemUnderTest } = makeSystemUnderTest({ validationError })
 
     populatePasswordField(systemUnderTest)
-    testStatusForField(systemUnderTest, 'password', validationError)
+    Helper.testStatusForField(systemUnderTest, 'password', validationError)
   })
 
   test('Should show valid email state if Validation succeeds', () => {
     const { systemUnderTest } = makeSystemUnderTest()
 
     populateEmailField(systemUnderTest)
-    testStatusForField(systemUnderTest, 'email')
+    Helper.testStatusForField(systemUnderTest, 'email')
   })
 
   test('Should show valid password state if Validation succeeds', () => {
     const { systemUnderTest } = makeSystemUnderTest()
 
     populatePasswordField(systemUnderTest)
-    testStatusForField(systemUnderTest, 'password')
+    Helper.testStatusForField(systemUnderTest, 'password')
   })
 
   test('Should enable submit button if form is valid', () => {
@@ -133,7 +117,7 @@ describe('Login component', () => {
     populateEmailField(systemUnderTest)
     populatePasswordField(systemUnderTest)
 
-    testButtonIsDisabled(systemUnderTest, 'submit', false)
+    Helper.testButtonIsDisabled(systemUnderTest, 'submit', false)
   })
 
   test('Should show spinner on submit', async () => {
@@ -141,7 +125,7 @@ describe('Login component', () => {
     await simulateValidSubmit(systemUnderTest)
 
     testElementExists(systemUnderTest, 'spinner')
-    testButtonIsDisabled(systemUnderTest, 'submit', true)
+    Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
   })
 
   test('Should call Authentication with correct values', async () => {
@@ -175,7 +159,7 @@ describe('Login component', () => {
     jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(systemUnderTest)
     testElementText(systemUnderTest, 'main-error', error.message)
-    testErrorWraperChildCount(systemUnderTest, 1)
+    Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
 
   test('Should call saveAccessToken on success', async () => {
@@ -190,7 +174,7 @@ describe('Login component', () => {
     jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(systemUnderTest)
     testElementText(systemUnderTest, 'main-error', error.message)
-    testErrorWraperChildCount(systemUnderTest, 1)
+    Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
 
   test('Should go to signup page', () => {

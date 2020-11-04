@@ -67,4 +67,32 @@ describe('Signup component', () => {
     Helper.populateField(systemUnderTest, 'passwordConfirmation')
     Helper.testStatusForField(systemUnderTest, 'passwordConfirmation', validationError)
   })
+
+  test('Should show valid name state if Validation succeeds', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+
+    Helper.populateField(systemUnderTest, 'name')
+    Helper.testStatusForField(systemUnderTest, 'name')
+  })
+
+  test('Should show valid email state if Validation succeeds', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+
+    Helper.populateField(systemUnderTest, 'email')
+    Helper.testStatusForField(systemUnderTest, 'email')
+  })
+
+  test('Should show valid password state if Validation succeeds', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+
+    Helper.populateField(systemUnderTest, 'password')
+    Helper.testStatusForField(systemUnderTest, 'password')
+  })
+
+  test('Should show valid passwordConfirmation state if Validation succeeds', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+
+    Helper.populateField(systemUnderTest, 'passwordConfirmation')
+    Helper.testStatusForField(systemUnderTest, 'passwordConfirmation')
+  })
 })

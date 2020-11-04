@@ -127,7 +127,7 @@ describe('Signup component', () => {
     const { systemUnderTest } = makeSystemUnderTest()
     await simulateValidSubmit(systemUnderTest)
 
-    testElementExists(systemUnderTest, 'spinner')
+    Helper.testElementExists(systemUnderTest, 'spinner')
     Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
   })
 })

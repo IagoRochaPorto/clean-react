@@ -49,11 +49,6 @@ const simulateValidSubmit = async (
   await waitFor(() => form)
 }
 
-const testElementExists = (systemUnderTest: RenderResult, fieldName: string): void => {
-  const el = systemUnderTest.getByTestId(fieldName)
-  expect(el).toBeTruthy()
-}
-
 const testElementText = (systemUnderTest: RenderResult, fieldName: string, text: string): void => {
   const el = systemUnderTest.getByTestId(fieldName)
   expect(el.textContent).toBe(text)
@@ -114,7 +109,7 @@ describe('Login component', () => {
     const { systemUnderTest } = makeSystemUnderTest()
     await simulateValidSubmit(systemUnderTest)
 
-    testElementExists(systemUnderTest, 'spinner')
+    Helper.testElementExists(systemUnderTest, 'spinner')
     Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
   })
 

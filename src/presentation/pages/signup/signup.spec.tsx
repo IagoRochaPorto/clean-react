@@ -187,4 +187,13 @@ describe('Signup component', () => {
     expect(saveAccessToken.accesstoken).toBe(addAccountSpy.account.accessToken)
     expect(history.location.pathname).toBe('/')
   })
+
+  test('Should present error if SaveAccessToken fails', async () => {
+    const { systemUnderTest, saveAccessToken } = makeSystemUnderTest()
+    const error = new EmailInUseError()
+    jest.spyOn(saveAccessToken, 'save').mockRejectedValueOnce(error)
+    await simulateValidSubmit(systemUnderTest)
+    Helper.testElementText(systemUnderTest, 'main-error', error.message)
+    Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
+  })
 })

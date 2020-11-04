@@ -2,10 +2,11 @@ import React from 'react'
 import faker from 'faker'
 import { RenderResult, render, cleanup, fireEvent, waitFor } from '@testing-library/react'
 import SignUp from './signup'
-import { Helper, ValidationStub } from '@/presentation/test'
+import { AddAccountSpy, Helper, ValidationStub } from '@/presentation/test'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
+  addAccountSpy: AddAccountSpy
 }
 
 type SystemUnderTestParams = {
@@ -15,10 +16,12 @@ type SystemUnderTestParams = {
 const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTypes => {
   const validationStub = new ValidationStub()
   validationStub.errorMessage = params?.validationError || ''
+  const addAccountSpy = new AddAccountSpy()
 
-  const systemUnderTest = render(<SignUp validation={validationStub} />)
+  const systemUnderTest = render(<SignUp validation={validationStub} addAccount={addAccountSpy} />)
   return {
-    systemUnderTest
+    systemUnderTest,
+    addAccountSpy
   }
 }
 
@@ -129,5 +132,15 @@ describe('Signup component', () => {
 
     Helper.testElementExists(systemUnderTest, 'spinner')
     Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
+  })
+
+  test('Should call AddAccount with correct values', async () => {
+    const { systemUnderTest, addAccountSpy } = makeSystemUnderTest()
+    const name = faker.name.findName()
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+    await simulateValidSubmit(systemUnderTest, name, email, password)
+
+    expect(addAccountSpy.params).toEqual({ name, email, password, passwordConfirmation: password })
   })
 })

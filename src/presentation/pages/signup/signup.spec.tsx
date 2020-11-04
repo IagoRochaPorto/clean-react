@@ -151,4 +151,13 @@ describe('Signup component', () => {
 
     expect(addAccountSpy.callsCount).toBe(1)
   })
+
+  test('Should not call Authentication if form is invalid', async () => {
+    const validationError = faker.random.words()
+    const { systemUnderTest, addAccountSpy } = makeSystemUnderTest({ validationError })
+
+    await simulateValidSubmit(systemUnderTest)
+
+    expect(addAccountSpy.callsCount).toBe(0)
+  })
 })

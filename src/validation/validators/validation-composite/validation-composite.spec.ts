@@ -22,7 +22,7 @@ describe('ValidationComposite', () => {
     const errorMessage = faker.random.words()
     fieldValidationsSpy[0].error = new Error(errorMessage)
     fieldValidationsSpy[1].error = new Error(faker.random.words())
-    const error = systemUnderTest.validate(fieldName, faker.random.word())
+    const error = systemUnderTest.validate(fieldName, { [fieldName]: faker.random.word() })
     expect(error).toBe(errorMessage)
   })
 
@@ -30,7 +30,7 @@ describe('ValidationComposite', () => {
     const fieldName = faker.database.column()
 
     const { systemUnderTest } = makeSystemUnderSystem(fieldName)
-    const error = systemUnderTest.validate(fieldName, 'any_value')
+    const error = systemUnderTest.validate(fieldName, { [fieldName]: 'any_value' })
     expect(error).toBeFalsy()
   })
 })

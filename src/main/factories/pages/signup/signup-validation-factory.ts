@@ -3,7 +3,7 @@ import { ValidationBuilder as Builder } from '@/validation/validators/builder/va
 
 export const makeSignupValidation = (): ValidationComposite => {
   return ValidationComposite.build([
-    ...Builder.field('name').required().email().build(),
+    ...Builder.field('name').required().build(),
     ...Builder.field('email').required().email().build(),
     ...Builder.field('password').required().minLength(5).build(),
     ...Builder.field('passwordConfirmation').required().minLength(5).build()

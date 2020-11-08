@@ -4,6 +4,7 @@ const baseUrl: string = Cypress.config().baseUrl
 
 describe('Login', () => {
   beforeEach(() => {
+    cy.server()
     cy.visit('login')
   })
 
@@ -34,24 +35,20 @@ describe('Login', () => {
     cy.getByTestId('error-wrapper').should('not.have.descendants')
   })
 
-  it('Should present error if invalid credentials are provided', () => {
-    cy.getByTestId('email').focus().type(faker.internet.email())
-    cy.getByTestId('password').focus().type(faker.random.alphaNumeric(5))
-    cy.getByTestId('submit').click()
-    cy.getByTestId('submit').getByTestId('spinner').should('exist')
-    cy.getByTestId('error-wrapper').getByTestId('main-error').should('not.exist')
-    cy.getByTestId('submit').getByTestId('spinner').should('not.exist')
-    cy.getByTestId('error-wrapper').getByTestId('main-error').should('contain.text', 'Credenciais inválidas')
-    cy.url().should('equal', `${baseUrl}/login`)
-  })
-
   it('Should present save accessToken if valid credentials are provided', () => {
+    cy.route({
+      method: 'POST',
+      url: /login/,
+      status: 200,
+      response: {
+        accessToken: faker.random.uuid()
+      }
+    })
     cy.getByTestId('email').focus().type('john@example.com')
     cy.getByTestId('password').focus().type('12345')
     cy.getByTestId('submit').click()
-    cy.getByTestId('submit').getByTestId('spinner').should('exist')
-    cy.getByTestId('error-wrapper').getByTestId('main-error').should('not.exist')
-    cy.getByTestId('submit').getByTestId('spinner').should('not.exist')
+    cy.getByTestId('main-error').should('not.exist')
+    cy.getByTestId('spinner').should('not.exist')
     cy.url().should('equal', `${baseUrl}/`)
     cy.window().then((window) => assert.isOk(window.localStorage.getItem('accessToken')))
   })

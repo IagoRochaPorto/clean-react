@@ -10,10 +10,11 @@ const Input: React.FC<Props> = (props: Props) => {
   const error = state[`${props.name}Error`]
 
   return (
-    <div className={Styles.inputWrapper}>
+    <div className={Styles.inputWrapper} data-status={error ? 'invalid' : 'valid'} data-testid={`${props.name}-wrap`}>
       <input
         {...props}
         ref={inputRef}
+        title={error}
         placeholder=" "
         data-testid={props.name}
         readOnly
@@ -24,12 +25,11 @@ const Input: React.FC<Props> = (props: Props) => {
         onClick={() => {
           inputRef.current.focus()
         }}
+        title={error}
+        data-testid={`${props.name}-label`}
       >
         {props.placeholder}
       </label>
-      <span data-testid={`${props.name}-status`} title={error || 'Deu certo!'} className={Styles.status}>
-        {error ? '🔴' : '🔵'}
-      </span>
     </div>
   )
 }

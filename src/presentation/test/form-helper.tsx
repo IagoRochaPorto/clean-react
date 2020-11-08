@@ -14,11 +14,14 @@ export const testButtonIsDisabled = (systemUnderTest: RenderResult, fieldName: s
 export const testStatusForField = (
   systemUnderTest: RenderResult,
   fieldName: string,
-  validationError?: string
+  validationError: string = ''
 ): void => {
-  const fieldStatus = systemUnderTest.getByTestId(`${fieldName}-status`)
-  expect(fieldStatus.title).toBe(validationError || 'Deu certo!')
-  expect(fieldStatus.textContent).toBe(validationError ? '🔴' : '🔵')
+  const wrap = systemUnderTest.getByTestId(`${fieldName}-wrap`)
+  const field = systemUnderTest.getByTestId(`${fieldName}`)
+  const label = systemUnderTest.getByTestId(`${fieldName}-label`)
+  expect(wrap.getAttribute('data-status')).toBe(validationError ? 'invalid' : 'valid')
+  expect(field.title).toBe(validationError)
+  expect(label.title).toBe(validationError)
 }
 
 export const populateField = (systemUnderTest: RenderResult, fieldName: string, value = faker.random.word()): void => {

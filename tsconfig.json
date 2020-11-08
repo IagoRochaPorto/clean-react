@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -12,11 +16,11 @@
       "@/*": ["*"]
     },
     "allowJs": true,
-    "resolveJsonModule": true,
-    "isolatedModules": false,
-    "strictNullChecks": false
+    "resolveJsonModule": true
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "exclude": [
     "src/main/test/cypress"
   ]

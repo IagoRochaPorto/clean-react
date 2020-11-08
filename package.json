@@ -40,7 +40,9 @@
     "webpack": "5.1.3",
     "webpack-cli": "^4.0.0",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^5.2.0"
+    "webpack-merge": "^5.2.0",
+    "@cypress/webpack-preprocessor": "^5.4.10",
+    "eslint-plugin-cypress": "^2.11.2"
   },
   "scripts": {
     "start": "webpack serve",
@@ -52,9 +54,7 @@
     "check": "yarn-check -u -s"
   },
   "dependencies": {
-    "@cypress/webpack-preprocessor": "^5.4.10",
     "axios": "^0.20.0",
-    "eslint-plugin-cypress": "^2.11.2",
     "react": "16.14.0",
     "react-dom": "16.14.0",
     "react-router-dom": "^5.2.0"

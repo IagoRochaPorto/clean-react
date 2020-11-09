@@ -74,6 +74,6 @@ describe('Signup', () => {
     Http.mockInvalidData()
     simulateValidSumit()
     formHelper.testMainError('Algo de errado aconteceu. Tente novamente em breve.')
-    formHelper.testUrl('/singup')
+    formHelper.testUrl('/signup')
   })
 })

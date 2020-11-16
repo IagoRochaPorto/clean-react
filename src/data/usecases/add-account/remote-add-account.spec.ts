@@ -1,6 +1,5 @@
 import { HttpPostClientSpy } from '@/data/test'
 import { HttpStatusCode } from '@/data/protocols/http'
-import { AddAccountParams } from '@/domain/usecases'
 import { mockAccountModel, mockAddAccountParams } from '@/domain/test'
 import { AccountModel } from '@/domain/models'
 import { EmailInUseError, UnexpectedError } from '@/domain/errors'
@@ -9,11 +8,11 @@ import faker from 'faker'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RemoteAddAccount
-  httpPostClientSpy: HttpPostClientSpy<AddAccountParams, AccountModel>
+  httpPostClientSpy: HttpPostClientSpy<AccountModel>
 }
 
 const makeSystemUnderTest = (url: string = faker.internet.url()): SystemUnderTestTypes => {
-  const httpPostClientSpy = new HttpPostClientSpy<AddAccountParams, AccountModel>()
+  const httpPostClientSpy = new HttpPostClientSpy<AccountModel>()
   const systemUnderTest = new RemoteAddAccount(url, httpPostClientSpy)
   return {
     systemUnderTest,

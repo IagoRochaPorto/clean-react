@@ -36,4 +36,13 @@ describe('RemoteLoadSurveyList', () => {
     const promise = systemUnderTest.loadAll()
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
+
+  test('Should throw UnexpectedError if HttpPGetClient returns 404', async () => {
+    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.notFound
+    }
+    const promise = systemUnderTest.loadAll()
+    await expect(promise).rejects.toThrow(new UnexpectedError())
+  })
 })

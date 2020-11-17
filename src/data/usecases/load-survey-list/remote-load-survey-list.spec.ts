@@ -45,4 +45,13 @@ describe('RemoteLoadSurveyList', () => {
     const promise = systemUnderTest.loadAll()
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
+
+  test('Should throw UnexpectedError if HttpPGetClient returns 500', async () => {
+    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.serverError
+    }
+    const promise = systemUnderTest.loadAll()
+    await expect(promise).rejects.toThrow(new UnexpectedError())
+  })
 })

@@ -18,25 +18,27 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
 }
 
 describe('AxiosHttpClient', () => {
-  test('Should call axios with correct values', async () => {
-    const request = mockPostRequest()
-    const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-    await systemUnderTest.post(request)
-    expect(mockedAxios.post).toHaveBeenCalledWith(request.url, request.body)
-  })
-
-  test('Should return the correct status code and the body', () => {
-    const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-    const promise = systemUnderTest.post(mockPostRequest())
-    expect(promise).toEqual(mockedAxios.post.mock.results[0].value)
-  })
-
-  test('Should return the correct status code and the body on failure', () => {
-    const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-    mockedAxios.post.mockRejectedValueOnce({
-      response: mockHttpResponse()
+  describe('post', () => {
+    test('Should call axios.post with correct values', async () => {
+      const request = mockPostRequest()
+      const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
+      await systemUnderTest.post(request)
+      expect(mockedAxios.post).toHaveBeenCalledWith(request.url, request.body)
     })
-    const promise = systemUnderTest.post(mockPostRequest())
-    expect(promise).toEqual(mockedAxios.post.mock.results[0].value)
+
+    test('Should return correct response on axios.post', () => {
+      const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
+      const promise = systemUnderTest.post(mockPostRequest())
+      expect(promise).toEqual(mockedAxios.post.mock.results[0].value)
+    })
+
+    test('Should return correct error on axios.post', () => {
+      const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
+      mockedAxios.post.mockRejectedValueOnce({
+        response: mockHttpResponse()
+      })
+      const promise = systemUnderTest.post(mockPostRequest())
+      expect(promise).toEqual(mockedAxios.post.mock.results[0].value)
+    })
   })
 })

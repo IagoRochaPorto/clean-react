@@ -26,10 +26,14 @@ describe('AxiosHttpClient', () => {
       expect(mockedAxios.post).toHaveBeenCalledWith(request.url, request.body)
     })
 
-    test('Should return correct response on axios.post', () => {
+    test('Should return correct response on axios.post', async () => {
       const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-      const promise = systemUnderTest.post(mockPostRequest())
-      expect(promise).toEqual(mockedAxios.post.mock.results[0].value)
+      const httpResponse = await systemUnderTest.post(mockPostRequest())
+      const axiosResponse = await mockedAxios.post.mock.results[0].value
+      expect(httpResponse).toEqual({
+        statusCode: axiosResponse.status,
+        body: axiosResponse.data
+      })
     })
 
     test('Should return correct error on axios.post', () => {

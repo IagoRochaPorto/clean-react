@@ -30,7 +30,6 @@
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: space-between;
-      flex-grow: 1;
       width: 100%;
 
       li {
@@ -94,6 +93,7 @@
             font-size: 18px;
             margin: 24px;
             align-self: center;
+            flex-grow: 1;
           }
         }
 
@@ -109,6 +109,20 @@
           &:hover {
             background: $primary-dark;
           }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .surveyListWrapper {
+    .contentWrapper {
+      ul {
+        flex-direction: column;
+
+        li {
+          flex-basis: 100%;
         }
       }
     }

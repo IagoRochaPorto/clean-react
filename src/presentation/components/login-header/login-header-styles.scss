@@ -1,6 +1,6 @@
 @import '../../styles/colors';
 
-.header {
+.headerWrapper {
   display: flex;
   flex-direction: column;
   border-top: 48px solid $primary-dark;
@@ -12,5 +12,11 @@
   h1 {
     color: $white;
     margin: 16px 0px 48px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .headerWrapper {
+    border-top-width: 20px;
   }
 }

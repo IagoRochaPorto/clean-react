@@ -4,13 +4,13 @@ import { createMemoryHistory } from 'history'
 import faker from 'faker'
 import { render, RenderResult, fireEvent, cleanup, waitFor, wait } from '@testing-library/react'
 import { Login } from '@/presentation/pages'
-import { ValidationStub, AuthenticationSpy, SaveAcessTokenMock, Helper } from '@/presentation/test'
+import { ValidationStub, AuthenticationSpy, UpdateCurrentAccountMock, Helper } from '@/presentation/test'
 import { InvalidCredentialsError } from '@/domain/errors'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
   authenticationSpy: AuthenticationSpy
-  saveAccessTokenMock: SaveAcessTokenMock
+  updateCurrentAccountMock: UpdateCurrentAccountMock
 }
 
 type SystemUnderTestParams = {
@@ -23,16 +23,20 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   const validationStub = new ValidationStub()
   validationStub.errorMessage = params?.validationError || ''
   const authenticationSpy = new AuthenticationSpy()
-  const saveAccessTokenMock = new SaveAcessTokenMock()
+  const updateCurrentAccountMock = new UpdateCurrentAccountMock()
   const systemUnderTest = render(
     <Router history={history}>
-      <Login validation={validationStub} authentication={authenticationSpy} saveAccessToken={saveAccessTokenMock} />
+      <Login
+        validation={validationStub}
+        authentication={authenticationSpy}
+        updateCurrentAccount={updateCurrentAccountMock}
+      />
     </Router>
   )
   return {
     systemUnderTest,
     authenticationSpy,
-    saveAccessTokenMock
+    updateCurrentAccountMock
   }
 }
 
@@ -142,17 +146,17 @@ describe('Login component', () => {
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
 
-  test('Should call saveAccessToken on success', async () => {
-    const { systemUnderTest, authenticationSpy, saveAccessTokenMock } = makeSystemUnderTest()
+  test('Should call updateCurrentAccount on success', async () => {
+    const { systemUnderTest, authenticationSpy, updateCurrentAccountMock } = makeSystemUnderTest()
     await simulateValidSubmit(systemUnderTest)
-    expect(saveAccessTokenMock.accesstoken).toBe(authenticationSpy.account.accessToken)
+    expect(updateCurrentAccountMock.account).toEqual(authenticationSpy.account)
     expect(history.location.pathname).toBe('/')
   })
 
   test('Should present error if SaveAccessToken fails', async () => {
-    const { systemUnderTest, saveAccessTokenMock } = makeSystemUnderTest()
+    const { systemUnderTest, updateCurrentAccountMock } = makeSystemUnderTest()
     const error = new InvalidCredentialsError()
-    jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
+    jest.spyOn(updateCurrentAccountMock, 'save').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(systemUnderTest)
     Helper.testElementText(systemUnderTest, 'main-error', error.message)
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)

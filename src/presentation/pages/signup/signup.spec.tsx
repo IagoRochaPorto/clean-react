@@ -4,13 +4,13 @@ import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { RenderResult, render, cleanup, fireEvent, waitFor } from '@testing-library/react'
 import SignUp from './signup'
-import { AddAccountSpy, Helper, SaveAcessTokenMock, ValidationStub } from '@/presentation/test'
+import { AddAccountSpy, Helper, UpdateCurrentAccountMock, ValidationStub } from '@/presentation/test'
 import { EmailInUseError } from '@/domain/errors'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
   addAccountSpy: AddAccountSpy
-  saveAccessToken: SaveAcessTokenMock
+  updateCurrentAccount: UpdateCurrentAccountMock
 }
 
 type SystemUnderTestParams = {
@@ -23,16 +23,16 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   const validationStub = new ValidationStub()
   validationStub.errorMessage = params?.validationError || ''
   const addAccountSpy = new AddAccountSpy()
-  const saveAccessToken = new SaveAcessTokenMock()
+  const updateCurrentAccount = new UpdateCurrentAccountMock()
   const systemUnderTest = render(
     <Router history={history}>
-      <SignUp validation={validationStub} addAccount={addAccountSpy} saveAccessToken={saveAccessToken} />
+      <SignUp validation={validationStub} addAccount={addAccountSpy} updateCurrentAccount={updateCurrentAccount} />
     </Router>
   )
   return {
     systemUnderTest,
     addAccountSpy,
-    saveAccessToken
+    updateCurrentAccount
   }
 }
 
@@ -181,17 +181,17 @@ describe('Signup component', () => {
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
 
-  test('Should call saveAccessToken on success', async () => {
-    const { systemUnderTest, addAccountSpy, saveAccessToken } = makeSystemUnderTest()
+  test('Should call updateCurrentAccount on success', async () => {
+    const { systemUnderTest, addAccountSpy, updateCurrentAccount } = makeSystemUnderTest()
     await simulateValidSubmit(systemUnderTest)
-    expect(saveAccessToken.accesstoken).toBe(addAccountSpy.account.accessToken)
+    expect(updateCurrentAccount.account).toEqual(addAccountSpy.account)
     expect(history.location.pathname).toBe('/')
   })
 
   test('Should present error if SaveAccessToken fails', async () => {
-    const { systemUnderTest, saveAccessToken } = makeSystemUnderTest()
+    const { systemUnderTest, updateCurrentAccount } = makeSystemUnderTest()
     const error = new EmailInUseError()
-    jest.spyOn(saveAccessToken, 'save').mockRejectedValueOnce(error)
+    jest.spyOn(updateCurrentAccount, 'save').mockRejectedValueOnce(error)
     await simulateValidSubmit(systemUnderTest)
     Helper.testElementText(systemUnderTest, 'main-error', error.message)
     Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)

@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import Styles from './login-styles.scss'
 import { LoginHeader, Footer, Input, FormStatus, SubmitButton } from '@/presentation/components'
-import Context from '@/presentation/contexts/form/form-context'
+import { FormContext, ApiContext } from '@/presentation/contexts'
 import { Validation } from '@/presentation/protocols/validation'
-import { Authentication, UpdateCurrentAccount } from '@/domain/usecases'
+import { Authentication } from '@/domain/usecases'
 
 type Props = {
   validation: Validation
   authentication: Authentication
-  updateCurrentAccount: UpdateCurrentAccount
 }
 
-const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccount }: Props) => {
+const Login: React.FC<Props> = ({ validation, authentication }: Props) => {
+  const { setCurrentAccount } = useContext(ApiContext)
   const history = useHistory()
   const [state, setState] = useState({
     isLoading: false,
@@ -45,7 +45,7 @@ const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccou
       }
       setState({ ...state, isLoading: true })
       const account = await authentication.auth({ email: state.email, password: state.password })
-      await updateCurrentAccount.save(account)
+      setCurrentAccount(account)
       history.replace('/')
     } catch (error) {
       setState({ ...state, isLoading: false, mainError: error.message })
@@ -55,7 +55,7 @@ const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccou
   return (
     <div className={Styles.loginWrapper}>
       <LoginHeader />
-      <Context.Provider value={{ state, setState }}>
+      <FormContext.Provider value={{ state, setState }}>
         <form data-testid="form" className={Styles.form} onSubmit={handleSubmit}>
           <h2>Login</h2>
           <Input type="email" name="email" placeholder="Digite seu email" />
@@ -66,7 +66,7 @@ const Login: React.FC<Props> = ({ validation, authentication, updateCurrentAccou
           </Link>
           <FormStatus />
         </form>
-      </Context.Provider>
+      </FormContext.Provider>
       <Footer />
     </div>
   )

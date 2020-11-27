@@ -3,14 +3,16 @@ import faker from 'faker'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { RenderResult, render, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import { ApiContext } from '@/presentation/contexts'
 import SignUp from './signup'
-import { AddAccountSpy, Helper, UpdateCurrentAccountMock, ValidationStub } from '@/presentation/test'
+import { AddAccountSpy, Helper, ValidationStub } from '@/presentation/test'
 import { EmailInUseError } from '@/domain/errors'
+import { AccountModel } from '@/domain/models'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RenderResult
   addAccountSpy: AddAccountSpy
-  updateCurrentAccount: UpdateCurrentAccountMock
+  setCurrentAccountMock: (account: AccountModel) => void
 }
 
 type SystemUnderTestParams = {
@@ -23,16 +25,18 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   const validationStub = new ValidationStub()
   validationStub.errorMessage = params?.validationError || ''
   const addAccountSpy = new AddAccountSpy()
-  const updateCurrentAccount = new UpdateCurrentAccountMock()
+  const setCurrentAccountMock = jest.fn()
   const systemUnderTest = render(
-    <Router history={history}>
-      <SignUp validation={validationStub} addAccount={addAccountSpy} updateCurrentAccount={updateCurrentAccount} />
-    </Router>
+    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
+      <Router history={history}>
+        <SignUp validation={validationStub} addAccount={addAccountSpy} />
+      </Router>
+    </ApiContext.Provider>
   )
   return {
     systemUnderTest,
     addAccountSpy,
-    updateCurrentAccount
+    setCurrentAccountMock
   }
 }
 
@@ -182,19 +186,10 @@ describe('Signup component', () => {
   })
 
   test('Should call updateCurrentAccount on success', async () => {
-    const { systemUnderTest, addAccountSpy, updateCurrentAccount } = makeSystemUnderTest()
+    const { systemUnderTest, addAccountSpy, setCurrentAccountMock } = makeSystemUnderTest()
     await simulateValidSubmit(systemUnderTest)
-    expect(updateCurrentAccount.account).toEqual(addAccountSpy.account)
+    expect(setCurrentAccountMock).toHaveBeenCalledWith(addAccountSpy.account)
     expect(history.location.pathname).toBe('/')
-  })
-
-  test('Should present error if SaveAccessToken fails', async () => {
-    const { systemUnderTest, updateCurrentAccount } = makeSystemUnderTest()
-    const error = new EmailInUseError()
-    jest.spyOn(updateCurrentAccount, 'save').mockRejectedValueOnce(error)
-    await simulateValidSubmit(systemUnderTest)
-    Helper.testElementText(systemUnderTest, 'main-error', error.message)
-    Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
   })
 
   test('Should go to login page', () => {

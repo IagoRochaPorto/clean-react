@@ -2,7 +2,7 @@ import React from 'react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import faker from 'faker'
-import { render, RenderResult, fireEvent, cleanup, waitFor } from '@testing-library/react'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 import { ApiContext } from '@/presentation/contexts'
 import { Login } from '@/presentation/pages'
 import { ValidationStub, AuthenticationSpy, Helper } from '@/presentation/test'
@@ -10,7 +10,6 @@ import { InvalidCredentialsError } from '@/domain/errors'
 import { AccountModel } from '@/domain/models'
 
 type SystemUnderTestTypes = {
-  systemUnderTest: RenderResult
   authenticationSpy: AuthenticationSpy
   setCurrentAccountMock: (account: AccountModel) => void
 }
@@ -26,7 +25,7 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   validationStub.errorMessage = params?.validationError || ''
   const authenticationSpy = new AuthenticationSpy()
   const setCurrentAccountMock = jest.fn()
-  const systemUnderTest = render(
+  render(
     <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
       <Router history={history}>
         <Login validation={validationStub} authentication={authenticationSpy} />
@@ -34,128 +33,125 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
     </ApiContext.Provider>
   )
   return {
-    systemUnderTest,
     authenticationSpy,
     setCurrentAccountMock
   }
 }
 
 const simulateValidSubmit = async (
-  systemUnderTest: RenderResult,
   email = faker.internet.email(),
   password = faker.internet.password()
 ): Promise<void> => {
-  Helper.populateField(systemUnderTest, 'email', email)
-  Helper.populateField(systemUnderTest, 'password', password)
+  Helper.populateField('email', email)
+  Helper.populateField('password', password)
 
-  const form = systemUnderTest.getByTestId('form') as HTMLButtonElement
+  const form = screen.getByTestId('form') as HTMLButtonElement
   fireEvent.submit(form)
   await waitFor(() => form)
 }
 
 describe('Login component', () => {
-  afterEach(cleanup)
   test('Should start with initial state', () => {
     const validationError = faker.random.words()
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+    makeSystemUnderTest({ validationError })
 
-    Helper.testChildCount(systemUnderTest, 'error-wrapper', 0)
-    Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
-    Helper.testStatusForField(systemUnderTest, 'email', validationError)
-    Helper.testStatusForField(systemUnderTest, 'password', validationError)
+    Helper.testChildCount('error-wrapper', 0)
+    Helper.testButtonIsDisabled('submit', true)
+    Helper.testStatusForField('email', validationError)
+    Helper.testStatusForField('password', validationError)
   })
 
   test('Should show email error if Validation fails', () => {
     const validationError = faker.random.words()
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+    makeSystemUnderTest({ validationError })
 
-    Helper.populateField(systemUnderTest, 'email')
-    Helper.testStatusForField(systemUnderTest, 'email', validationError)
+    Helper.populateField('email')
+    Helper.testStatusForField('email', validationError)
   })
 
   test('Should show password error if Validation fails', () => {
     const validationError = faker.random.words()
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+    makeSystemUnderTest({ validationError })
 
-    Helper.populateField(systemUnderTest, 'password')
-    Helper.testStatusForField(systemUnderTest, 'password', validationError)
+    Helper.populateField('password')
+    Helper.testStatusForField('password', validationError)
   })
 
   test('Should show valid email state if Validation succeeds', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'email')
-    Helper.testStatusForField(systemUnderTest, 'email')
+    Helper.populateField('email')
+    Helper.testStatusForField('email')
   })
 
   test('Should show valid password state if Validation succeeds', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'password')
-    Helper.testStatusForField(systemUnderTest, 'password')
+    Helper.populateField('password')
+    Helper.testStatusForField('password')
   })
 
   test('Should enable submit button if form is valid', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'email')
-    Helper.populateField(systemUnderTest, 'password')
+    Helper.populateField('email')
+    Helper.populateField('password')
 
-    Helper.testButtonIsDisabled(systemUnderTest, 'submit', false)
+    Helper.testButtonIsDisabled('submit', false)
   })
 
   test('Should show spinner on submit', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    await simulateValidSubmit(systemUnderTest)
+    makeSystemUnderTest()
+    await simulateValidSubmit()
 
-    Helper.testElementExists(systemUnderTest, 'spinner')
-    Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
+    Helper.testElementExists('spinner')
+    Helper.testButtonIsDisabled('submit', true)
   })
 
   test('Should call Authentication with correct values', async () => {
-    const { systemUnderTest, authenticationSpy } = makeSystemUnderTest()
+    const { authenticationSpy } = makeSystemUnderTest()
     const email = faker.internet.email()
     const password = faker.internet.password()
-    await simulateValidSubmit(systemUnderTest, email, password)
+    await simulateValidSubmit(email, password)
 
     expect(authenticationSpy.params).toEqual({ email, password })
   })
   test('Should call Authentication only once', async () => {
-    const { systemUnderTest, authenticationSpy } = makeSystemUnderTest()
-    await simulateValidSubmit(systemUnderTest)
-    await simulateValidSubmit(systemUnderTest)
+    const { authenticationSpy } = makeSystemUnderTest()
+    await simulateValidSubmit()
+    await simulateValidSubmit()
 
     expect(authenticationSpy.callsCount).toBe(1)
   })
 
   test('Should not call Authentication if form is invalid', async () => {
     const validationError = faker.random.words()
-    const { systemUnderTest, authenticationSpy } = makeSystemUnderTest({ validationError })
+    const { authenticationSpy } = makeSystemUnderTest({ validationError })
 
-    await simulateValidSubmit(systemUnderTest)
+    await simulateValidSubmit()
 
     expect(authenticationSpy.callsCount).toBe(0)
   })
 
   test('Should present error if Authentication fails', async () => {
-    const { systemUnderTest, authenticationSpy } = makeSystemUnderTest()
+    const { authenticationSpy } = makeSystemUnderTest()
     const error = new InvalidCredentialsError()
     jest.spyOn(authenticationSpy, 'auth').mockRejectedValueOnce(error)
-    await simulateValidSubmit(systemUnderTest)
-    Helper.testElementText(systemUnderTest, 'main-error', error.message)
-    Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
+    await simulateValidSubmit()
+    Helper.testElementText('main-error', error.message)
+    Helper.testChildCount('error-wrapper', 1)
   })
 
   test('Should call updateCurrentAccount on success', async () => {
-    const { systemUnderTest, authenticationSpy, setCurrentAccountMock } = makeSystemUnderTest()
-    await simulateValidSubmit(systemUnderTest)
+    const { authenticationSpy, setCurrentAccountMock } = makeSystemUnderTest()
+    await simulateValidSubmit()
     expect(setCurrentAccountMock).toHaveBeenCalledWith(authenticationSpy.account)
     expect(history.location.pathname).toBe('/')
   })
 
   test('Should go to signup page', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const register = systemUnderTest.getByTestId('signupLink')
+    makeSystemUnderTest()
+    const register = screen.getByTestId('signupLink')
     fireEvent.click(register)
     expect(history.length).toBe(2)
     expect(history.location.pathname).toBe('/signup')

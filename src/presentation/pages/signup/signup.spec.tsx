@@ -2,7 +2,7 @@ import React from 'react'
 import faker from 'faker'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
-import { RenderResult, render, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 import { ApiContext } from '@/presentation/contexts'
 import SignUp from './signup'
 import { AddAccountSpy, Helper, ValidationStub } from '@/presentation/test'
@@ -10,7 +10,6 @@ import { EmailInUseError } from '@/domain/errors'
 import { AccountModel } from '@/domain/models'
 
 type SystemUnderTestTypes = {
-  systemUnderTest: RenderResult
   addAccountSpy: AddAccountSpy
   setCurrentAccountMock: (account: AccountModel) => void
 }
@@ -26,7 +25,7 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   validationStub.errorMessage = params?.validationError || ''
   const addAccountSpy = new AddAccountSpy()
   const setCurrentAccountMock = jest.fn()
-  const systemUnderTest = render(
+  render(
     <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
       <Router history={history}>
         <SignUp validation={validationStub} addAccount={addAccountSpy} />
@@ -34,167 +33,163 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
     </ApiContext.Provider>
   )
   return {
-    systemUnderTest,
     addAccountSpy,
     setCurrentAccountMock
   }
 }
 
 const simulateValidSubmit = async (
-  systemUnderTest: RenderResult,
   name = faker.name.findName(),
   email = faker.internet.email(),
   password = faker.internet.password()
 ): Promise<void> => {
-  Helper.populateField(systemUnderTest, 'name', name)
-  Helper.populateField(systemUnderTest, 'email', email)
-  Helper.populateField(systemUnderTest, 'password', password)
-  Helper.populateField(systemUnderTest, 'passwordConfirmation', password)
+  Helper.populateField('name', name)
+  Helper.populateField('email', email)
+  Helper.populateField('password', password)
+  Helper.populateField('passwordConfirmation', password)
 
-  const form = systemUnderTest.getByTestId('form') as HTMLButtonElement
+  const form = screen.getByTestId('form') as HTMLButtonElement
   fireEvent.submit(form)
   await waitFor(() => form)
 }
 
 describe('Signup component', () => {
-  afterEach(cleanup)
-
   test('Should start with initial state', () => {
     const validationError = 'Campo obrigatório'
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
-    Helper.testChildCount(systemUnderTest, 'error-wrapper', 0)
-    Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
-    Helper.testStatusForField(systemUnderTest, 'name', validationError)
-    Helper.testStatusForField(systemUnderTest, 'email', validationError)
-    Helper.testStatusForField(systemUnderTest, 'password', validationError)
-    Helper.testStatusForField(systemUnderTest, 'passwordConfirmation', validationError)
+    makeSystemUnderTest({ validationError })
+    Helper.testChildCount('error-wrapper', 0)
+    Helper.testButtonIsDisabled('submit', true)
+    Helper.testStatusForField('name', validationError)
+    Helper.testStatusForField('email', validationError)
+    Helper.testStatusForField('password', validationError)
+    Helper.testStatusForField('passwordConfirmation', validationError)
   })
 
   test('Should show name error if Validation fails', () => {
     const validationError = faker.random.words()
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+    makeSystemUnderTest({ validationError })
 
-    Helper.populateField(systemUnderTest, 'name')
-    Helper.testStatusForField(systemUnderTest, 'name', validationError)
+    Helper.populateField('name')
+    Helper.testStatusForField('name', validationError)
   })
 
   test('Should show email error if Validation fails', () => {
     const validationError = faker.random.words()
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+    makeSystemUnderTest({ validationError })
 
-    Helper.populateField(systemUnderTest, 'email')
-    Helper.testStatusForField(systemUnderTest, 'email', validationError)
+    Helper.populateField('email')
+    Helper.testStatusForField('email', validationError)
   })
 
   test('Should show password error if Validation fails', () => {
     const validationError = faker.random.words()
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+    makeSystemUnderTest({ validationError })
 
-    Helper.populateField(systemUnderTest, 'password')
-    Helper.testStatusForField(systemUnderTest, 'password', validationError)
+    Helper.populateField('password')
+    Helper.testStatusForField('password', validationError)
   })
 
   test('Should show passwordConfirmation error if Validation fails', () => {
     const validationError = faker.random.words()
-    const { systemUnderTest } = makeSystemUnderTest({ validationError })
+    makeSystemUnderTest({ validationError })
 
-    Helper.populateField(systemUnderTest, 'passwordConfirmation')
-    Helper.testStatusForField(systemUnderTest, 'passwordConfirmation', validationError)
+    Helper.populateField('passwordConfirmation')
+    Helper.testStatusForField('passwordConfirmation', validationError)
   })
 
   test('Should show valid name state if Validation succeeds', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'name')
-    Helper.testStatusForField(systemUnderTest, 'name')
+    Helper.populateField('name')
+    Helper.testStatusForField('name')
   })
 
   test('Should show valid email state if Validation succeeds', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'email')
-    Helper.testStatusForField(systemUnderTest, 'email')
+    Helper.populateField('email')
+    Helper.testStatusForField('email')
   })
 
   test('Should show valid password state if Validation succeeds', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'password')
-    Helper.testStatusForField(systemUnderTest, 'password')
+    Helper.populateField('password')
+    Helper.testStatusForField('password')
   })
 
   test('Should show valid passwordConfirmation state if Validation succeeds', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'passwordConfirmation')
-    Helper.testStatusForField(systemUnderTest, 'passwordConfirmation')
+    Helper.populateField('passwordConfirmation')
+    Helper.testStatusForField('passwordConfirmation')
   })
 
   test('Should enable submit button if form is valid', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
+    makeSystemUnderTest()
 
-    Helper.populateField(systemUnderTest, 'name')
-    Helper.populateField(systemUnderTest, 'email')
-    Helper.populateField(systemUnderTest, 'password')
-    Helper.populateField(systemUnderTest, 'passwordConfirmation')
+    Helper.populateField('name')
+    Helper.populateField('email')
+    Helper.populateField('password')
+    Helper.populateField('passwordConfirmation')
 
-    Helper.testButtonIsDisabled(systemUnderTest, 'submit', false)
+    Helper.testButtonIsDisabled('submit', false)
   })
 
   test('Should show spinner on submit', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    await simulateValidSubmit(systemUnderTest)
+    makeSystemUnderTest()
+    await simulateValidSubmit()
 
-    Helper.testElementExists(systemUnderTest, 'spinner')
-    Helper.testButtonIsDisabled(systemUnderTest, 'submit', true)
+    Helper.testElementExists('spinner')
+    Helper.testButtonIsDisabled('submit', true)
   })
 
   test('Should call AddAccount with correct values', async () => {
-    const { systemUnderTest, addAccountSpy } = makeSystemUnderTest()
+    const { addAccountSpy } = makeSystemUnderTest()
     const name = faker.name.findName()
     const email = faker.internet.email()
     const password = faker.internet.password()
-    await simulateValidSubmit(systemUnderTest, name, email, password)
+    await simulateValidSubmit(name, email, password)
 
     expect(addAccountSpy.params).toEqual({ name, email, password, passwordConfirmation: password })
   })
 
   test('Should call Authentication only once', async () => {
-    const { systemUnderTest, addAccountSpy } = makeSystemUnderTest()
-    await simulateValidSubmit(systemUnderTest)
-    await simulateValidSubmit(systemUnderTest)
+    const { addAccountSpy } = makeSystemUnderTest()
+    await simulateValidSubmit()
+    await simulateValidSubmit()
 
     expect(addAccountSpy.callsCount).toBe(1)
   })
 
   test('Should not call Authentication if form is invalid', async () => {
     const validationError = faker.random.words()
-    const { systemUnderTest, addAccountSpy } = makeSystemUnderTest({ validationError })
+    const { addAccountSpy } = makeSystemUnderTest({ validationError })
 
-    await simulateValidSubmit(systemUnderTest)
+    await simulateValidSubmit()
 
     expect(addAccountSpy.callsCount).toBe(0)
   })
 
   test('Should present error if AddAccount fails', async () => {
-    const { systemUnderTest, addAccountSpy } = makeSystemUnderTest()
+    const { addAccountSpy } = makeSystemUnderTest()
     const error = new EmailInUseError()
     jest.spyOn(addAccountSpy, 'add').mockRejectedValueOnce(error)
-    await simulateValidSubmit(systemUnderTest)
-    Helper.testElementText(systemUnderTest, 'main-error', error.message)
-    Helper.testChildCount(systemUnderTest, 'error-wrapper', 1)
+    await simulateValidSubmit()
+    Helper.testElementText('main-error', error.message)
+    Helper.testChildCount('error-wrapper', 1)
   })
 
   test('Should call updateCurrentAccount on success', async () => {
-    const { systemUnderTest, addAccountSpy, setCurrentAccountMock } = makeSystemUnderTest()
-    await simulateValidSubmit(systemUnderTest)
+    const { addAccountSpy, setCurrentAccountMock } = makeSystemUnderTest()
+    await simulateValidSubmit()
     expect(setCurrentAccountMock).toHaveBeenCalledWith(addAccountSpy.account)
     expect(history.location.pathname).toBe('/')
   })
 
   test('Should go to login page', () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const loginLink = systemUnderTest.getByTestId('loginLink')
+    makeSystemUnderTest()
+    const loginLink = screen.getByTestId('loginLink')
     fireEvent.click(loginLink)
     expect(history.length).toBe(1)
     expect(history.location.pathname).toBe('/login')

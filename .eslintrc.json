@@ -19,6 +19,7 @@
   "rules": {
     "@typescript-eslint/consistent-type-definitions": "off",
     "@typescript-eslint/strict-boolean-expressions": 0,
+    "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/comma-spacing": 0,
     "@typescript-eslint/require-await": 0,
     "space-before-function-paren": "off",

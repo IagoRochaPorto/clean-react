@@ -1,9 +1,10 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { queryByTestId, render, screen, waitFor } from '@testing-library/react'
 import { SurveyList } from '@/presentation/pages'
 import { LoadSurveyList } from '@/domain/usecases'
 import { SurveyModel } from '@/domain/models'
 import { mockSurveyListModel } from '@/domain/test'
+import { UnexpectedError } from '@/domain/errors'
 
 class LoadSurveyListSpy implements LoadSurveyList {
   callsCount = 0
@@ -18,8 +19,7 @@ type SystemUnderTestTypes = {
   loadSurveyListSpy: LoadSurveyListSpy
 }
 
-const makeSystemUnderSystem = (): SystemUnderTestTypes => {
-  const loadSurveyListSpy = new LoadSurveyListSpy()
+const makeSystemUnderSystem = (loadSurveyListSpy = new LoadSurveyListSpy()): SystemUnderTestTypes => {
   render(<SurveyList loadSurveyList={loadSurveyListSpy} />)
 
   return {
@@ -32,6 +32,7 @@ describe('SurveyList Component', () => {
     makeSystemUnderSystem()
     const surveyList = screen.getByTestId('survey-list')
     expect(surveyList.querySelectorAll('li:empty')).toHaveLength(4)
+    expect(screen.queryByTestId('error')).not.toBeInTheDocument()
     await waitFor(() => surveyList)
   })
 
@@ -46,5 +47,16 @@ describe('SurveyList Component', () => {
     const surveyList = screen.getByTestId('survey-list')
     await waitFor(() => surveyList)
     expect(surveyList.querySelectorAll('li.surveyItemWrapper')).toHaveLength(3)
+    expect(screen.queryByTestId('error')).not.toBeInTheDocument()
+  })
+
+  test('Should render error on failure', async () => {
+    const loadSurveyListSpy = new LoadSurveyListSpy()
+    const error = new UnexpectedError()
+    jest.spyOn(loadSurveyListSpy, 'loadAll').mockRejectedValueOnce(error)
+    makeSystemUnderSystem(loadSurveyListSpy)
+    await waitFor(() => screen.getByRole('heading'))
+    expect(screen.queryByTestId('survey-list')).not.toBeInTheDocument()
+    expect(screen.getByTestId('error')).toHaveTextContent(error.message)
   })
 })

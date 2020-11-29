@@ -1,3 +1,3 @@
 export interface GetStorage {
-  set(key: string): any
+  get(key: string): any
 }

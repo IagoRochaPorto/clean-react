@@ -20,12 +20,13 @@ input[type='text'] {
 }
 
 button {
-  background: $primary-light;
+  background: $primary;
   color: $white;
   border-radius: 8px;
   font-size: 16px;
   border: none;
   line-height: 50px;
+  padding: 0px 16px;
   cursor: pointer;
   height: 50px;
 

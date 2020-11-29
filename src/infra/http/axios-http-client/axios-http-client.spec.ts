@@ -51,7 +51,7 @@ describe('AxiosHttpClient', () => {
       const request = mockGetRequest()
       const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
       await systemUnderTest.get(request)
-      expect(mockedAxios.get).toHaveBeenCalledWith(request.url)
+      expect(mockedAxios.get).toHaveBeenCalledWith(request.url, { headers: request.headers })
     })
 
     test('Should return correct response on axios.get', async () => {

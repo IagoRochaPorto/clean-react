@@ -1,18 +1,17 @@
 import { HttpPostClientSpy } from '@/data/test'
 import { HttpStatusCode } from '@/data/protocols/http'
-import { mockAccountModel, mockAddAccountParams } from '@/domain/test'
-import { AccountModel } from '@/domain/models'
+import { mockAddAccountModel, mockAddAccountParams } from '@/domain/test'
 import { EmailInUseError, UnexpectedError } from '@/domain/errors'
 import { RemoteAddAccount } from './remote-add-account'
 import faker from 'faker'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RemoteAddAccount
-  httpPostClientSpy: HttpPostClientSpy<AccountModel>
+  httpPostClientSpy: HttpPostClientSpy<RemoteAddAccount.Model>
 }
 
 const makeSystemUnderTest = (url: string = faker.internet.url()): SystemUnderTestTypes => {
-  const httpPostClientSpy = new HttpPostClientSpy<AccountModel>()
+  const httpPostClientSpy = new HttpPostClientSpy<RemoteAddAccount.Model>()
   const systemUnderTest = new RemoteAddAccount(url, httpPostClientSpy)
   return {
     systemUnderTest,
@@ -70,9 +69,9 @@ describe('RemoteAuthentication', () => {
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 
-  test('Should return an AccountModel if HttpPostClient returns 200', async () => {
+  test('Should return an AddAccount.Model if HttpPostClient returns 200', async () => {
     const { systemUnderTest, httpPostClientSpy } = makeSystemUnderTest()
-    const httpResult = mockAccountModel()
+    const httpResult = mockAddAccountModel()
     httpPostClientSpy.response = {
       statusCode: HttpStatusCode.ok,
       body: httpResult

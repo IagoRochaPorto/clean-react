@@ -2,17 +2,16 @@ import { RemoteLoadSurveyList } from './remote-load-survey-list'
 import { HttpGetClientSpy } from '@/data/test'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { UnexpectedError } from '@/domain/errors'
-import { SurveyModel } from '@/domain/models'
 import { mockSurveyListModel } from '@/domain/test'
 import faker from 'faker'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RemoteLoadSurveyList
-  httpGetClientSpy: HttpGetClientSpy<SurveyModel[]>
+  httpGetClientSpy: HttpGetClientSpy<RemoteLoadSurveyList.Model[]>
 }
 
 const makeSystemUnderTest = (url = faker.internet.url()): SystemUnderTestTypes => {
-  const httpGetClientSpy = new HttpGetClientSpy<SurveyModel[]>()
+  const httpGetClientSpy = new HttpGetClientSpy<RemoteLoadSurveyList.Model[]>()
   const systemUnderTest = new RemoteLoadSurveyList(url, httpGetClientSpy)
 
   return {
@@ -56,7 +55,7 @@ describe('RemoteLoadSurveyList', () => {
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 
-  test('Should return a List of SurveyModels if HttpGetClient returns 200', async () => {
+  test('Should return a List of RemoteLoadSurveyList.Models if HttpGetClient returns 200', async () => {
     const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
     const httpResult = mockSurveyListModel()
     httpGetClientSpy.response = {

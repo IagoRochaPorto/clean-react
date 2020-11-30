@@ -20,10 +20,4 @@ describe('CurrentAccountAdapter', () => {
     expect(getSpy).toHaveBeenCalledWith('account')
     expect(result).toEqual(account)
   })
-
-  test('Should throw UnexpectedError', () => {
-    expect(() => {
-      setCurrentAccountAdapter(undefined)
-    }).toThrow(new UnexpectedError())
-  })
 })

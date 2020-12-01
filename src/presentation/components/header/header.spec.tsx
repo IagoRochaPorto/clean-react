@@ -5,16 +5,17 @@ import { Router } from 'react-router-dom'
 import { createMemoryHistory, MemoryHistory } from 'history'
 import React from 'react'
 import { AccountModel } from '@/domain/models'
+import { mockAccountModel } from '@/domain/test'
 type SystemUnderTestTypes = {
   history: MemoryHistory
   setCurrentAccountMock: (account: AccountModel) => void
 }
 
-const makeSystemUnderTest = (): SystemUnderTestTypes => {
+const makeSystemUnderTest = (account = mockAccountModel()): SystemUnderTestTypes => {
   const history = createMemoryHistory({ initialEntries: ['/'] })
   const setCurrentAccountMock = jest.fn()
   render(
-    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
+    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock, getCurrentAccount: () => account }}>
       <Router history={history}>
         <Header />)
       </Router>
@@ -32,5 +33,11 @@ describe('Header Component', () => {
     fireEvent.click(screen.getByTestId('logout'))
     expect(setCurrentAccountMock).toHaveBeenCalledWith(undefined)
     expect(history.location.pathname)
+  })
+
+  test('Should render username correctly ', () => {
+    const account = mockAccountModel()
+    makeSystemUnderTest(account)
+    expect(screen.getByTestId('username')).toHaveTextContent(account.name)
   })
 })

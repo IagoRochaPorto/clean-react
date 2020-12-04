@@ -1,4 +1,5 @@
-import * as formHelper from '../support/form-helper'
+import * as FormHelper from '../support/form-helpers'
+import * as Helper from '../support/helpers'
 import * as Http from '../support/signup-mocks'
 import faker from 'faker'
 
@@ -21,13 +22,13 @@ describe('Signup', () => {
   })
 
   it('Should load with correct initial state', () => {
-    formHelper.testInputStatus('name', 'Campo obrigatório')
+    FormHelper.testInputStatus('name', 'Campo obrigatório')
     cy.getByTestId('name').should('have.attr', 'readonly')
-    formHelper.testInputStatus('email', 'Campo obrigatório')
+    FormHelper.testInputStatus('email', 'Campo obrigatório')
     cy.getByTestId('email').should('have.attr', 'readonly')
-    formHelper.testInputStatus('password', 'Campo obrigatório')
+    FormHelper.testInputStatus('password', 'Campo obrigatório')
     cy.getByTestId('password').should('have.attr', 'readonly')
-    formHelper.testInputStatus('passwordConfirmation', 'Campo obrigatório')
+    FormHelper.testInputStatus('passwordConfirmation', 'Campo obrigatório')
     cy.getByTestId('passwordConfirmation').should('have.attr', 'readonly')
     cy.getByTestId('submit').should('have.attr', 'disabled', 'disabled')
     cy.getByTestId('error-wrapper').should('not.have.descendants')
@@ -35,13 +36,13 @@ describe('Signup', () => {
 
   it('Should present error state if form is invalid', () => {
     cy.getByTestId('name').focus().type(faker.random.alphaNumeric(3))
-    formHelper.testInputStatus('name', 'Valor inválido')
+    FormHelper.testInputStatus('name', 'Valor inválido')
     cy.getByTestId('email').focus().type(faker.random.word())
-    formHelper.testInputStatus('email', 'Valor inválido')
+    FormHelper.testInputStatus('email', 'Valor inválido')
     cy.getByTestId('password').focus().type(faker.random.alphaNumeric(3))
-    formHelper.testInputStatus('password', 'Valor inválido')
+    FormHelper.testInputStatus('password', 'Valor inválido')
     cy.getByTestId('passwordConfirmation').focus().type(faker.random.alphaNumeric(4))
-    formHelper.testInputStatus('passwordConfirmation', 'Valor inválido')
+    FormHelper.testInputStatus('passwordConfirmation', 'Valor inválido')
     cy.getByTestId('submit').should('have.attr', 'disabled', 'disabled')
     cy.getByTestId('error-wrapper').should('not.have.descendants')
   })
@@ -49,13 +50,13 @@ describe('Signup', () => {
   it('Should present valid state if form is valid', () => {
     const password = faker.random.alphaNumeric(5)
     cy.getByTestId('name').focus().type(faker.name.findName())
-    formHelper.testInputStatus('name')
+    FormHelper.testInputStatus('name')
     cy.getByTestId('email').focus().type(faker.internet.email())
-    formHelper.testInputStatus('email')
+    FormHelper.testInputStatus('email')
     cy.getByTestId('password').focus().type(password)
-    formHelper.testInputStatus('password')
+    FormHelper.testInputStatus('password')
     cy.getByTestId('passwordConfirmation').focus().type(password)
-    formHelper.testInputStatus('passwordConfirmation')
+    FormHelper.testInputStatus('passwordConfirmation')
     cy.getByTestId('submit').should('not.have.attr', 'disabled', 'disabled')
     cy.getByTestId('error-wrapper').should('not.have.descendants')
   })
@@ -63,42 +64,35 @@ describe('Signup', () => {
   it('Should present EmailInUseError on 403', () => {
     Http.mockEmailInUseError()
     simulateValidSumit()
-    formHelper.testMainError('Esse email já está em uso')
-    formHelper.testUrl('/signup')
+    FormHelper.testMainError('Esse email já está em uso')
+    Helper.testUrl('/signup')
   })
 
   it('Should present unexpectedError on 400 ', () => {
     Http.mockUnexpectedError()
     simulateValidSumit()
-    formHelper.testMainError('Algo de errado aconteceu. Tente novamente em breve.')
-    formHelper.testUrl('/signup')
-  })
-
-  it('Should present unexpectedError if invalid data is returned', () => {
-    Http.mockInvalidData()
-    simulateValidSumit()
-    formHelper.testMainError('Algo de errado aconteceu. Tente novamente em breve.')
-    formHelper.testUrl('/signup')
+    FormHelper.testMainError('Algo de errado aconteceu. Tente novamente em breve.')
+    Helper.testUrl('/signup')
   })
 
   it('Should present save accessToken if valid credentials are provided', () => {
     Http.mockOk()
     cy.getByTestId('error-wrapper').should('not.have.descendants')
     simulateValidSumit()
-    formHelper.testUrl('/')
-    formHelper.testLocalStorageItem('account')
+    Helper.testUrl('/')
+    Helper.testLocalStorageItem('account')
   })
 
   it('Should prevent multiple submits', () => {
     Http.mockOk()
     populateFields()
     cy.getByTestId('submit').dblclick()
-    formHelper.testHttpCallsCount(1)
+    Helper.testHttpCallsCount(1)
   })
 
   it('Should not call submit if form is invalid', () => {
     Http.mockOk()
     cy.getByTestId('email').focus().type(faker.internet.email()).type('{enter}')
-    formHelper.testHttpCallsCount(0)
+    Helper.testHttpCallsCount(0)
   })
 })

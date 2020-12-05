@@ -4,3 +4,8 @@ node_jds:
 script:
   - eslint 'src/**'
   - yarn test:ci
+build:
+  provider: heroku
+  api_key: $HEROKU_API
+  app: fordevs-iagorocha
+  skip_cleanup: true

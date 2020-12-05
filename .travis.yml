@@ -16,5 +16,7 @@ deploy:
   api_key: $HEROKU_API
   app: fordevs-iagorocha
   skip_cleanup: true
+  on:
+    branch: main
 notifications:
   email: false

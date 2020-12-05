@@ -5,8 +5,8 @@ module.exports = {
   entry: './src/main/index.tsx',
   output: {
     path: path.join(__dirname, 'dist/'),
-    publicPath: '/dist',
-    filename: 'main-bundle-[contenthash].js'
+    filename: 'main-bundle-[contenthash].js',
+    publicPath: '/'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.scss'],
@@ -14,7 +14,6 @@ module.exports = {
       '@': path.join(__dirname, 'src')
     }
   },
-
   plugins: [
     new CleanWebpackPlugin()
   ]

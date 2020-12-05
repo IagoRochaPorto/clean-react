@@ -1,11 +1,21 @@
 language: node_js
 node_jds:
   - 12
+addons:
+  packages:
+    - libgconf-2-4
+cache:
+  yarn: true
+  directories:
+    - '~/.cache'
 script:
   - eslint 'src/**'
   - yarn test:ci
+  - yarn test:cypress:ci
 build:
   provider: heroku
   api_key: $HEROKU_API
   app: fordevs-iagorocha
   skip_cleanup: true
+notifications:
+  email: false

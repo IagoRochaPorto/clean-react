@@ -11,8 +11,8 @@ describe('CompareFieldsValidation', () => {
     const fieldToCompare = faker.database.column()
     const systemUnderSystem = makeSystemUnderTest(field, fieldToCompare)
     const error = systemUnderSystem.validate({
-      [field]: faker.random.words(3),
-      [fieldToCompare]: faker.random.words(4)
+      [field]: 'any_value',
+      [fieldToCompare]: 'other_value'
     })
 
     expect(error).toEqual(new InvalidFieldError())

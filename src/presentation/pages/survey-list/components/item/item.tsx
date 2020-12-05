@@ -18,7 +18,7 @@ const SurveyItem: React.FC<Props> = ({ survey }: Props) => {
             {survey.date.getDate().toString().padStart(2, '0').toLowerCase()}
           </span>
           <span data-testid="month" className={Styles.month}>
-            {survey.date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').toLowerCase()}
+            {survey.date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toLowerCase()}
           </span>
           <span data-testid="year" className={Styles.year}>
             {survey.date.getFullYear()}

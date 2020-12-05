@@ -15,10 +15,10 @@ const SurveyItem: React.FC<Props> = ({ survey }: Props) => {
         <Icon className={Styles.iconWrapper} iconName={iconName} />
         <time>
           <span data-testid="day" className={Styles.day}>
-            {survey.date.getDate().toString().padStart(2, '0')}
+            {survey.date.getDate().toString().padStart(2, '0').toLowerCase()}
           </span>
           <span data-testid="month" className={Styles.month}>
-            {survey.date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '')}
+            {survey.date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').toLowerCase()}
           </span>
           <span data-testid="year" className={Styles.year}>
             {survey.date.getFullYear()}

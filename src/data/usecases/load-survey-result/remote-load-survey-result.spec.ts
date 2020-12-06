@@ -1,5 +1,5 @@
 import { RemoteLoadSurveyResult } from './remote-load-survey-result'
-import { HttpGetClientSpy } from '@/data/test'
+import { HttpGetClientSpy, mockRemoteSurveyResultModel } from '@/data/test'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { AccessDeniedError, UnexpectedError } from '@/domain/errors'
 import faker from 'faker'
@@ -12,6 +12,10 @@ type SystemUnderTestTypes = {
 const makeSystemUnderTest = (url = faker.internet.url()): SystemUnderTestTypes => {
   const httpGetClientSpy = new HttpGetClientSpy()
   const systemUnderTest = new RemoteLoadSurveyResult(url, httpGetClientSpy)
+  httpGetClientSpy.response = {
+    statusCode: HttpStatusCode.ok,
+    body: mockRemoteSurveyResultModel()
+  }
   return {
     systemUnderTest,
     httpGetClientSpy
@@ -51,5 +55,20 @@ describe('RemoteLoadSurveyResult', () => {
     }
     const promise = systemUnderTest.load()
     await expect(promise).rejects.toThrow(new UnexpectedError())
+  })
+
+  test('Should return a SurveyResult on 200', async () => {
+    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
+    const httpResult = mockRemoteSurveyResultModel()
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.ok,
+      body: httpResult
+    }
+    const httpResponse = await systemUnderTest.load()
+    expect(httpResponse).toEqual({
+      question: httpResult.question,
+      answers: httpResult.answers,
+      date: new Date(httpResult.date)
+    })
   })
 })

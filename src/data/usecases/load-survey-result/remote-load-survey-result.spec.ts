@@ -1,7 +1,7 @@
 import { RemoteLoadSurveyResult } from './remote-load-survey-result'
 import { HttpGetClientSpy } from '@/data/test'
 import { HttpStatusCode } from '@/data/protocols/http'
-import { AccessDeniedError } from '@/domain/errors'
+import { AccessDeniedError, UnexpectedError } from '@/domain/errors'
 import faker from 'faker'
 
 type SystemUnderTestTypes = {
@@ -33,5 +33,14 @@ describe('RemoteLoadSurveyResult', () => {
     }
     const promise = systemUnderTest.load()
     await expect(promise).rejects.toThrow(new AccessDeniedError())
+  })
+
+  test('Should throw UnexpectedError if HttpGetClient returns 404', async () => {
+    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.notFound
+    }
+    const promise = systemUnderTest.load()
+    await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 })

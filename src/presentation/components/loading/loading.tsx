@@ -4,7 +4,7 @@ import Styles from './loading-styles.scss'
 
 const Loading: React.FC = () => {
   return (
-    <div className={Styles.loadingWrapper}>
+    <div data-testid="loading" className={Styles.loadingWrapper}>
       <div className={Styles.loading}>
         <span>Aguarde...</span>
         <Spinner isNegative />

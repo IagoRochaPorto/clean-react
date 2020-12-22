@@ -6,7 +6,7 @@ type SystemUnderTest = {
   fieldValidationsSpy: FieldValidationSpy[]
 }
 
-const makeSystemUnderSystem = (fieldName: string): SystemUnderTest => {
+const makeSystemUnderTest = (fieldName: string): SystemUnderTest => {
   const fieldValidationsSpy = [new FieldValidationSpy(fieldName), new FieldValidationSpy(fieldName)]
   const systemUnderTest = ValidationComposite.build(fieldValidationsSpy)
   return {
@@ -18,7 +18,7 @@ const makeSystemUnderSystem = (fieldName: string): SystemUnderTest => {
 describe('ValidationComposite', () => {
   test('Should return error if any validation fails', () => {
     const fieldName = faker.database.column()
-    const { systemUnderTest, fieldValidationsSpy } = makeSystemUnderSystem(fieldName)
+    const { systemUnderTest, fieldValidationsSpy } = makeSystemUnderTest(fieldName)
     const errorMessage = faker.random.words()
     fieldValidationsSpy[0].error = new Error(errorMessage)
     fieldValidationsSpy[1].error = new Error(faker.random.words())
@@ -29,7 +29,7 @@ describe('ValidationComposite', () => {
   test('Should return falsy if none validation fails', () => {
     const fieldName = faker.database.column()
 
-    const { systemUnderTest } = makeSystemUnderSystem(fieldName)
+    const { systemUnderTest } = makeSystemUnderTest(fieldName)
     const error = systemUnderTest.validate(fieldName, { [fieldName]: 'any_value' })
     expect(error).toBeFalsy()
   })

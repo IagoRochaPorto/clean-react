@@ -9,8 +9,8 @@ describe('CompareFieldsValidation', () => {
   test('Should return error if compare is invalid ', () => {
     const field = 'any_field'
     const fieldToCompare = 'other_field'
-    const systemUnderSystem = makeSystemUnderTest(field, fieldToCompare)
-    const error = systemUnderSystem.validate({
+    const systemUnderTest = makeSystemUnderTest(field, fieldToCompare)
+    const error = systemUnderTest.validate({
       [field]: 'any_value',
       [fieldToCompare]: 'other_value'
     })
@@ -22,8 +22,8 @@ describe('CompareFieldsValidation', () => {
     const field = 'any_field'
     const fieldToCompare = 'other_field'
     const value = faker.random.word()
-    const systemUnderSystem = makeSystemUnderTest(field, fieldToCompare)
-    const error = systemUnderSystem.validate({ [field]: value, [fieldToCompare]: value })
+    const systemUnderTest = makeSystemUnderTest(field, fieldToCompare)
+    const error = systemUnderTest.validate({ [field]: value, [fieldToCompare]: value })
     expect(error).toBeFalsy()
   })
 })

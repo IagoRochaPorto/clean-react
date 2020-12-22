@@ -14,7 +14,7 @@ type SystemUnderTestTypes = {
   setCurrentAccountMock: (account: AccountModel) => void
 }
 
-const makeSystemUnderSystem = (loadSurveyListSpy = new LoadSurveyListSpy()): SystemUnderTestTypes => {
+const makeSystemUnderTest = (loadSurveyListSpy = new LoadSurveyListSpy()): SystemUnderTestTypes => {
   const history = createMemoryHistory({ initialEntries: ['/'] })
   const setCurrentAccountMock = jest.fn()
   render(
@@ -36,7 +36,7 @@ const makeSystemUnderSystem = (loadSurveyListSpy = new LoadSurveyListSpy()): Sys
 
 describe('SurveyList Component', () => {
   test('Should present 4 empty items on start', async () => {
-    makeSystemUnderSystem()
+    makeSystemUnderTest()
     const surveyList = screen.getByTestId('survey-list')
     expect(surveyList.querySelectorAll('li:empty')).toHaveLength(4)
     expect(screen.queryByTestId('error')).not.toBeInTheDocument()
@@ -44,13 +44,13 @@ describe('SurveyList Component', () => {
   })
 
   test('Should call LoadSurveyList', async () => {
-    const { loadSurveyListSpy } = makeSystemUnderSystem()
+    const { loadSurveyListSpy } = makeSystemUnderTest()
     expect(loadSurveyListSpy.callsCount).toBe(1)
     await waitFor(() => screen.getByRole('heading'))
   })
 
   test('Should render SurveyItems on success', async () => {
-    makeSystemUnderSystem()
+    makeSystemUnderTest()
     const surveyList = screen.getByTestId('survey-list')
     await waitFor(() => surveyList)
     expect(surveyList.querySelectorAll('li.surveyItemWrapper')).toHaveLength(3)
@@ -61,7 +61,7 @@ describe('SurveyList Component', () => {
     const loadSurveyListSpy = new LoadSurveyListSpy()
     const error = new UnexpectedError()
     jest.spyOn(loadSurveyListSpy, 'loadAll').mockRejectedValueOnce(error)
-    makeSystemUnderSystem(loadSurveyListSpy)
+    makeSystemUnderTest(loadSurveyListSpy)
     await waitFor(() => screen.getByRole('heading'))
     expect(screen.queryByTestId('survey-list')).not.toBeInTheDocument()
     expect(screen.getByTestId('error')).toHaveTextContent(error.message)
@@ -70,7 +70,7 @@ describe('SurveyList Component', () => {
   test('Should logout on AccessDeniedError', async () => {
     const loadSurveyListSpy = new LoadSurveyListSpy()
     jest.spyOn(loadSurveyListSpy, 'loadAll').mockRejectedValueOnce(new AccessDeniedError())
-    const { history, setCurrentAccountMock } = makeSystemUnderSystem(loadSurveyListSpy)
+    const { history, setCurrentAccountMock } = makeSystemUnderTest(loadSurveyListSpy)
     await waitFor(() => screen.getByRole('heading'))
     expect(setCurrentAccountMock).toHaveBeenCalledWith(undefined)
     expect(history.location.pathname).toBe('/login')
@@ -79,7 +79,7 @@ describe('SurveyList Component', () => {
   test('Should call LoadSurveyList on reload', async () => {
     const loadSurveyListSpy = new LoadSurveyListSpy()
     jest.spyOn(loadSurveyListSpy, 'loadAll').mockRejectedValueOnce(new UnexpectedError())
-    makeSystemUnderSystem(loadSurveyListSpy)
+    makeSystemUnderTest(loadSurveyListSpy)
     await waitFor(() => screen.getByRole('heading'))
     fireEvent.click(screen.getByTestId('reload'))
     expect(loadSurveyListSpy.callsCount).toBe(1)

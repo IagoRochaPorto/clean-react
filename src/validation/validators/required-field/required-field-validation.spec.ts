@@ -7,15 +7,15 @@ const makeSystemUnderTest = (field: string): RequiredFieldValidation => new Requ
 describe('RequiredFieldValidation', () => {
   test('Should return error if field is empty ', () => {
     const field = faker.database.column()
-    const systemUnderSystem = makeSystemUnderTest(field)
-    const error = systemUnderSystem.validate({ [field]: '' })
+    const systemUnderTest = makeSystemUnderTest(field)
+    const error = systemUnderTest.validate({ [field]: '' })
     expect(error).toEqual(new RequiredFieldError())
   })
 
   test('Should return falsy if field is not empty ', () => {
     const field = faker.database.column()
-    const systemUnderSystem = makeSystemUnderTest(field)
-    const error = systemUnderSystem.validate({ [field]: faker.random.word() })
+    const systemUnderTest = makeSystemUnderTest(field)
+    const error = systemUnderTest.validate({ [field]: faker.random.word() })
     expect(error).toBeFalsy()
   })
 })

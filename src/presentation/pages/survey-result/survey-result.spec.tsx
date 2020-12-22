@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { SurveyResult } from '@/presentation/pages'
 import { ApiContext } from '@/presentation/contexts'
 import { mockAccountModel, LoadSurveyResultSpy, mockSurveyResultModel } from '@/domain/test'
@@ -79,10 +79,10 @@ describe('SurveyResult Component', () => {
   })
 
   test('Should render error on UnexpectedError', async () => {
-    const loadSurveyListSpy = new LoadSurveyResultSpy()
+    const loadSurveyResultSpy = new LoadSurveyResultSpy()
     const error = new UnexpectedError()
-    jest.spyOn(loadSurveyListSpy, 'load').mockRejectedValueOnce(error)
-    makeSystemUnderTest(loadSurveyListSpy)
+    jest.spyOn(loadSurveyResultSpy, 'load').mockRejectedValueOnce(error)
+    makeSystemUnderTest(loadSurveyResultSpy)
     await waitFor(() => screen.getByTestId('survey-result'))
     expect(screen.queryByTestId('question')).not.toBeInTheDocument()
     expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
@@ -96,5 +96,15 @@ describe('SurveyResult Component', () => {
     await waitFor(() => screen.getByTestId('survey-result'))
     expect(setCurrentAccountMock).toHaveBeenCalledWith(undefined)
     expect(history.location.pathname).toBe('/login')
+  })
+
+  test('Should call LoadSurveyResult on reload', async () => {
+    const loadSurveyResultSpy = new LoadSurveyResultSpy()
+    jest.spyOn(loadSurveyResultSpy, 'load').mockRejectedValueOnce(new UnexpectedError())
+    makeSystemUnderTest(loadSurveyResultSpy)
+    await waitFor(() => screen.getByTestId('survey-result'))
+    fireEvent.click(screen.getByTestId('reload'))
+    expect(loadSurveyResultSpy.callsCount).toBe(1)
+    await waitFor(() => screen.getByTestId('survey-result'))
   })
 })

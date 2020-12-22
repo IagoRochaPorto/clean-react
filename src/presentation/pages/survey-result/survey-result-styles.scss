@@ -78,8 +78,8 @@
         color: $primary-dark;
         margin-top: 16px;
 
-        &:active {
-          border: 2px solid $primary-light;
+        &.active {
+          box-shadow: 0 0 3px 2px $primary-light;
         }
 
         img {

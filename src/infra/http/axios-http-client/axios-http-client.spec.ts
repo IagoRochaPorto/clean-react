@@ -1,6 +1,6 @@
 import { AxiosHttpClient } from './axios-http-client'
 import { mockAxios, mockHttpResponse } from '@/infra/test'
-import { mockGetRequest, mockPostRequest } from '@/data/test/index'
+import { mockHttpRequest } from '@/data/test/index'
 import axios from 'axios'
 
 jest.mock('axios')
@@ -18,59 +18,36 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
 }
 
 describe('AxiosHttpClient', () => {
-  describe('post', () => {
-    test('Should call axios.post with correct values', async () => {
-      const request = mockPostRequest()
+  describe('request', () => {
+    test('Should call axios with correct values', async () => {
+      const request = mockHttpRequest()
       const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-      await systemUnderTest.post(request)
-      expect(mockedAxios.post).toHaveBeenCalledWith(request.url, request.body)
+      await systemUnderTest.request(request)
+      expect(mockedAxios.request).toHaveBeenCalledWith({
+        url: request.url,
+        data: request.body,
+        headers: request.headers,
+        method: request.method
+      })
     })
 
-    test('Should return correct response on axios.post', async () => {
+    test('Should return correct response on axios', async () => {
       const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-      const httpResponse = await systemUnderTest.post(mockPostRequest())
-      const axiosResponse = await mockedAxios.post.mock.results[0].value
+      const httpResponse = await systemUnderTest.request(mockHttpRequest())
+      const axiosResponse = await mockedAxios.request.mock.results[0].value
       expect(httpResponse).toEqual({
         statusCode: axiosResponse.status,
         body: axiosResponse.data
       })
     })
 
-    test('Should return correct error on axios.post', () => {
+    test('Should return correct error on axios', () => {
       const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-      mockedAxios.post.mockRejectedValueOnce({
+      mockedAxios.request.mockRejectedValueOnce({
         response: mockHttpResponse()
       })
-      const promise = systemUnderTest.post(mockPostRequest())
-      expect(promise).toEqual(mockedAxios.post.mock.results[0].value)
-    })
-  })
-
-  describe('get', () => {
-    test('Should call axios.get with correct values', async () => {
-      const request = mockGetRequest()
-      const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-      await systemUnderTest.get(request)
-      expect(mockedAxios.get).toHaveBeenCalledWith(request.url, { headers: request.headers })
-    })
-
-    test('Should return correct response on axios.get', async () => {
-      const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-      const httpResponse = await systemUnderTest.get(mockGetRequest())
-      const axiosResponse = await mockedAxios.get.mock.results[0].value
-      expect(httpResponse).toEqual({
-        statusCode: axiosResponse.status,
-        body: axiosResponse.data
-      })
-    })
-
-    test('Should return correct error on axios.get', () => {
-      const { systemUnderTest, mockedAxios } = makeSystemUnderTest()
-      mockedAxios.get.mockRejectedValueOnce({
-        response: mockHttpResponse()
-      })
-      const promise = systemUnderTest.get(mockGetRequest())
-      expect(promise).toEqual(mockedAxios.get.mock.results[0].value)
+      const promise = systemUnderTest.request(mockHttpRequest())
+      expect(promise).toEqual(mockedAxios.request.mock.results[0].value)
     })
   })
 })

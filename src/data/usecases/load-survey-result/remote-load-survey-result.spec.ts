@@ -1,56 +1,57 @@
 import { RemoteLoadSurveyResult } from './remote-load-survey-result'
-import { HttpGetClientSpy, mockRemoteSurveyResultModel } from '@/data/test'
+import { HttpClientSpy, mockRemoteSurveyResultModel } from '@/data/test'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { AccessDeniedError, UnexpectedError } from '@/domain/errors'
 import faker from 'faker'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RemoteLoadSurveyResult
-  httpGetClientSpy: HttpGetClientSpy
+  httpClientSpy: HttpClientSpy
 }
 
 const makeSystemUnderTest = (url = faker.internet.url()): SystemUnderTestTypes => {
-  const httpGetClientSpy = new HttpGetClientSpy()
-  const systemUnderTest = new RemoteLoadSurveyResult(url, httpGetClientSpy)
-  httpGetClientSpy.response = {
+  const httpClientSpy = new HttpClientSpy()
+  const systemUnderTest = new RemoteLoadSurveyResult(url, httpClientSpy)
+  httpClientSpy.response = {
     statusCode: HttpStatusCode.ok,
     body: mockRemoteSurveyResultModel()
   }
   return {
     systemUnderTest,
-    httpGetClientSpy
+    httpClientSpy
   }
 }
 
 describe('RemoteLoadSurveyResult', () => {
-  test('Should call HttpGetClient with correct url', async () => {
+  test('Should call HttpClient with correct url and method', async () => {
     const url = faker.internet.url()
-    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest(url)
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest(url)
     await systemUnderTest.load()
-    expect(httpGetClientSpy.url).toBe(url)
+    expect(httpClientSpy.url).toBe(url)
+    expect(httpClientSpy.method).toBe('get')
   })
 
-  test('Should throw AccessDeniedError if HttpGetClient returns 403', async () => {
-    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
-    httpGetClientSpy.response = {
+  test('Should throw AccessDeniedError if HttpClient returns 403', async () => {
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
+    httpClientSpy.response = {
       statusCode: HttpStatusCode.forbidden
     }
     const promise = systemUnderTest.load()
     await expect(promise).rejects.toThrow(new AccessDeniedError())
   })
 
-  test('Should throw UnexpectedError if HttpGetClient returns 404', async () => {
-    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
-    httpGetClientSpy.response = {
+  test('Should throw UnexpectedError if HttpClient returns 404', async () => {
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
+    httpClientSpy.response = {
       statusCode: HttpStatusCode.notFound
     }
     const promise = systemUnderTest.load()
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 
-  test('Should throw UnexpectedError if HttpGetClient returns 500', async () => {
-    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
-    httpGetClientSpy.response = {
+  test('Should throw UnexpectedError if HttpClient returns 500', async () => {
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
+    httpClientSpy.response = {
       statusCode: HttpStatusCode.serverError
     }
     const promise = systemUnderTest.load()
@@ -58,9 +59,9 @@ describe('RemoteLoadSurveyResult', () => {
   })
 
   test('Should return a SurveyResult on 200', async () => {
-    const { systemUnderTest, httpGetClientSpy } = makeSystemUnderTest()
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
     const httpResult = mockRemoteSurveyResultModel()
-    httpGetClientSpy.response = {
+    httpClientSpy.response = {
       statusCode: HttpStatusCode.ok,
       body: httpResult
     }

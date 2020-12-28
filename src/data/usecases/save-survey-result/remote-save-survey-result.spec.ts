@@ -60,4 +60,19 @@ describe('RemoteSaveSurveyResult', () => {
     const promise = systemUnderTest.save(mockSaveSurveyResultParams())
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
+
+  test('Should return a SurveyResult on 200', async () => {
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
+    const httpResult = mockRemoteSurveyResultModel()
+    httpClientSpy.response = {
+      statusCode: HttpStatusCode.ok,
+      body: httpResult
+    }
+    const httpResponse = await systemUnderTest.save(mockSaveSurveyResultParams())
+    expect(httpResponse).toEqual({
+      question: httpResult.question,
+      answers: httpResult.answers,
+      date: new Date(httpResult.date)
+    })
+  })
 })

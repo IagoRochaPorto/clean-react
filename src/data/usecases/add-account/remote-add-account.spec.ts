@@ -19,18 +19,13 @@ const makeSystemUnderTest = (url: string = faker.internet.url()): SystemUnderTes
   }
 }
 describe('RemoteAuthentication', () => {
-  test('Should call HttpClient with correct URL and method', async () => {
+  test('Should call HttpClient with correct values', async () => {
     const url = faker.internet.url()
     const { systemUnderTest, httpClientSpy } = makeSystemUnderTest(url)
-    await systemUnderTest.add(mockAddAccountParams())
-    expect(httpClientSpy.url).toBe(url)
-    expect(httpClientSpy.method).toBe('post')
-  })
-
-  test('Should call HttpClient with correct body', async () => {
-    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
     const addAccountParams = mockAddAccountParams()
     await systemUnderTest.add(addAccountParams)
+    expect(httpClientSpy.url).toBe(url)
+    expect(httpClientSpy.method).toBe('post')
     expect(httpClientSpy.body).toEqual(addAccountParams)
   })
 

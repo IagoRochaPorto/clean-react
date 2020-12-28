@@ -114,4 +114,12 @@ describe('SurveyResult Component', () => {
     fireEvent.click(screen.getByTestId('back-button'))
     expect(history.location.pathname).toBe('/')
   })
+
+  test('Should not present loading on active answer click', async () => {
+    makeSystemUnderTest()
+    await waitFor(() => screen.getByTestId('survey-result'))
+    const answerWrapper = screen.queryAllByTestId('answer-wrapper')
+    fireEvent.click(answerWrapper[0])
+    expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+  })
 })

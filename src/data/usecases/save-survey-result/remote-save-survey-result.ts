@@ -8,9 +8,10 @@ export class RemoteSaveSurveyResult implements SaveSurveyResult {
 
   async save(params: SaveSurveyResult.Params): Promise<SaveSurveyResult.Model> {
     const httpResponse = await this.httpClient.request({ url: this.url, method: 'put', body: params })
+    const remoteSurveyResult = httpResponse.body
     switch (httpResponse.statusCode) {
       case HttpStatusCode.ok:
-        return null
+        return Object.assign({}, remoteSurveyResult, { date: new Date(remoteSurveyResult.date) })
 
       case HttpStatusCode.forbidden:
         throw new AccessDeniedError()

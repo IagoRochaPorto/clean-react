@@ -3,7 +3,7 @@ import { HttpClientSpy, mockRemoteSurveyResultModel } from '@/data/test'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { mockSaveSurveyResultParams } from '@/domain/test'
 import faker from 'faker'
-import { AccessDeniedError } from '@/domain/errors'
+import { AccessDeniedError, UnexpectedError } from '@/domain/errors'
 
 type SystemUnderTestTypes = {
   systemUnderTest: RemoteSaveSurveyResult
@@ -41,5 +41,14 @@ describe('RemoteSaveSurveyResult', () => {
     }
     const promise = systemUnderTest.save(mockSaveSurveyResultParams())
     await expect(promise).rejects.toThrow(new AccessDeniedError())
+  })
+
+  test('Should throw UnexpectedError if HttpClient returns 404', async () => {
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
+    httpClientSpy.response = {
+      statusCode: HttpStatusCode.notFound
+    }
+    const promise = systemUnderTest.save(mockSaveSurveyResultParams())
+    await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 })

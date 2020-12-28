@@ -53,4 +53,12 @@ describe('SurveyResult', () => {
       assert.equal(li.find('[data-testid="percent"]').text(), '30%')
     })
   })
+
+  it('Should logout on AccessDeniedError', () => {
+    cy.visit('')
+    mockSuccess()
+    cy.visit('/surveys/any_id')
+    cy.getByTestId('back-button').click()
+    Helper.testUrl('/')
+  })
 })

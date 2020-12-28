@@ -51,4 +51,13 @@ describe('RemoteSaveSurveyResult', () => {
     const promise = systemUnderTest.save(mockSaveSurveyResultParams())
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
+
+  test('Should throw UnexpectedError if HttpClient returns 500', async () => {
+    const { systemUnderTest, httpClientSpy } = makeSystemUnderTest()
+    httpClientSpy.response = {
+      statusCode: HttpStatusCode.serverError
+    }
+    const promise = systemUnderTest.save(mockSaveSurveyResultParams())
+    await expect(promise).rejects.toThrow(new UnexpectedError())
+  })
 })

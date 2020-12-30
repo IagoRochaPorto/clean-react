@@ -144,4 +144,18 @@ describe('SurveyResult Component', () => {
     })
     await waitFor(() => screen.getByTestId('survey-result'))
   })
+
+  test('Should render error on UnexpectedError', async () => {
+    const saveSurveyResultSpy = new SaveSurveyResultSpy()
+    const error = new UnexpectedError()
+    jest.spyOn(saveSurveyResultSpy, 'save').mockRejectedValueOnce(error)
+    makeSystemUnderTest({ saveSurveyResultSpy })
+    await waitFor(() => screen.getByTestId('survey-result'))
+    const answerWrapper = screen.queryAllByTestId('answer-wrapper')
+    fireEvent.click(answerWrapper[1])
+    await waitFor(() => screen.getByTestId('survey-result'))
+    expect(screen.queryByTestId('question')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+    expect(screen.getByTestId('error')).toHaveTextContent(error.message)
+  })
 })

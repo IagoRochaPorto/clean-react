@@ -1,6 +1,5 @@
 import * as Helper from '../utils/helpers'
 import * as Http from '../utils/http-mocks'
-import faker from 'faker'
 
 const path = /surveys/
 const mockLoadSuccess = (): void => Http.mockOk(path, 'GET', 'fx:survey-result')
@@ -67,6 +66,7 @@ describe('SurveyResult', () => {
 
   describe('save', () => {
     const mockUnexpectedError = (): void => Http.mockServerError(path, 'PUT')
+    const mockAccessDeniedError = (): void => Http.mockForbiddenError(path, 'PUT')
 
     beforeEach(() => {
       cy.fixture('account').then((account) => {
@@ -80,6 +80,12 @@ describe('SurveyResult', () => {
       mockUnexpectedError()
       cy.get('li:nth-child(2)').click()
       cy.getByTestId('error').should('contain.text', 'Algo de errado aconteceu. Tente novamente em breve.')
+    })
+
+    it('Should logout on AccessDeniedError', () => {
+      mockAccessDeniedError()
+      cy.get('li:nth-child(2)').click()
+      Helper.testUrl('/login')
     })
   })
 })

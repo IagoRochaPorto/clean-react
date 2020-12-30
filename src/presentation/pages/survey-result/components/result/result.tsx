@@ -18,13 +18,11 @@ const Result: React.FC<Props> = ({ surveyResult }: Props) => {
         <Calendar date={surveyResult.date} className={Styles['calendar-wrapper']} />
         <h2 data-testid="question">{surveyResult.question}</h2>
       </hgroup>
-      <FlipMove data-testid="answers" className={Styles['answers-list']}>
-        <>
-          {surveyResult.answers.map((answer) => (
-            <SurveyResultAnswer answer={answer} key={answer.answer} />
-          ))}
-        </>
-      </FlipMove>
+      <ul data-testid="answers" className={Styles['answers-list']}>
+        {surveyResult.answers.map((answer) => (
+          <SurveyResultAnswer answer={answer} key={answer.answer} />
+        ))}
+      </ul>
       <button className={Styles.button} data-testid="back-button" onClick={() => goBack()}>
         Voltar
       </button>

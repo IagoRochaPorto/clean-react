@@ -12,7 +12,7 @@ type Props = {
 
 const SurveyResult: React.FC<Props> = ({ loadSurveyResult, saveSurveyResult }: Props) => {
   const handleError = useErrorHandler((error: Error) => {
-    setState((oldState) => ({ ...oldState, surveyResult: null, error: error.message }))
+    setState((oldState) => ({ ...oldState, surveyResult: null, error: error.message, isLoading: false }))
   })
 
   const [state, setState] = useState({

@@ -1,6 +1,5 @@
 import React from 'react'
 import Styles from './result-styles.scss'
-import FlipMove from 'react-flip-move'
 import { Calendar } from '@/presentation/components'
 import { useHistory } from 'react-router-dom'
 import { LoadSurveyResult } from '@/domain/usecases'

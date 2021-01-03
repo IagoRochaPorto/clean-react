@@ -1,15 +1,10 @@
 import React from 'react'
 import { fireEvent, render, RenderResult } from '@testing-library/react'
-import Input from './input'
-import Context from '@/presentation/contexts/form/form-context'
+import InputBase from './input'
 import faker from 'faker'
 
 const makeSystemUnderTest = (fieldName: string): RenderResult => {
-  return render(
-    <Context.Provider value={{ state: {} }}>
-      <Input name={fieldName} />
-    </Context.Provider>
-  )
+  return render(<InputBase name={fieldName} state={{}} setState={null} />)
 }
 
 describe('Input Component', () => {

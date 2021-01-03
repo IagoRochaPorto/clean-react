@@ -1,9 +1,11 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import Styles from './form-status-styles.scss'
-import Context from '@/presentation/contexts/form/form-context'
 
-const FormStatus: React.FC = () => {
-  const { state } = useContext(Context)
+type Props = {
+  state: any
+}
+
+const FormStatus: React.FC<Props> = ({ state }: Props) => {
   const { mainError } = state
   return (
     <div data-testid="error-wrapper" className={Styles.errorWrapper}>

@@ -9,6 +9,7 @@ import { Helper, ValidationStub } from '@/presentation/test'
 import { AddAccountSpy } from '@/domain/test'
 import { EmailInUseError } from '@/domain/errors'
 import { AddAccount } from '@/domain/usecases'
+import { RecoilRoot } from 'recoil'
 
 type SystemUnderTestTypes = {
   addAccountSpy: AddAccountSpy
@@ -27,11 +28,13 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   const addAccountSpy = new AddAccountSpy()
   const setCurrentAccountMock = jest.fn()
   render(
-    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
-      <Router history={history}>
-        <SignUp validation={validationStub} addAccount={addAccountSpy} />
-      </Router>
-    </ApiContext.Provider>
+    <RecoilRoot>
+      <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
+        <Router history={history}>
+          <SignUp validation={validationStub} addAccount={addAccountSpy} />
+        </Router>
+      </ApiContext.Provider>
+    </RecoilRoot>
   )
   return {
     addAccountSpy,

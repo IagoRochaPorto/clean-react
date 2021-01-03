@@ -3,13 +3,13 @@ import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import faker from 'faker'
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
-import { ApiContext } from '@/presentation/contexts'
 import { Login } from '@/presentation/pages'
 import { ValidationStub, Helper } from '@/presentation/test'
 import { InvalidCredentialsError } from '@/domain/errors'
 import { Authentication } from '@/domain/usecases'
 import { AuthenticationSpy } from '@/domain/test'
 import { RecoilRoot } from 'recoil'
+import { currentAccountState } from '@/presentation/components'
 
 type SystemUnderTestTypes = {
   authenticationSpy: AuthenticationSpy
@@ -28,12 +28,14 @@ const makeSystemUnderTest = (params?: SystemUnderTestParams): SystemUnderTestTyp
   const authenticationSpy = new AuthenticationSpy()
   const setCurrentAccountMock = jest.fn()
   render(
-    <RecoilRoot>
-      <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
-        <Router history={history}>
-          <Login validation={validationStub} authentication={authenticationSpy} />
-        </Router>
-      </ApiContext.Provider>
+    <RecoilRoot
+      initializeState={({ set }) =>
+        set(currentAccountState, { setCurrentAccount: setCurrentAccountMock, getCurrentAccount: null })
+      }
+    >
+      <Router history={history}>
+        <Login validation={validationStub} authentication={authenticationSpy} />
+      </Router>
     </RecoilRoot>
   )
   return {

@@ -3,11 +3,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { SurveyList } from '@/presentation/pages'
 import { LoadSurveyListSpy, mockAccountModel } from '@/domain/test'
 import { AccessDeniedError, UnexpectedError } from '@/domain/errors'
-import { ApiContext } from '@/presentation/contexts'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory, MemoryHistory } from 'history'
 import { AccountModel } from '@/domain/models'
 import { RecoilRoot } from 'recoil'
+import { currentAccountState } from '@/presentation/components'
 
 type SystemUnderTestTypes = {
   loadSurveyListSpy: LoadSurveyListSpy
@@ -19,14 +19,17 @@ const makeSystemUnderTest = (loadSurveyListSpy = new LoadSurveyListSpy()): Syste
   const history = createMemoryHistory({ initialEntries: ['/'] })
   const setCurrentAccountMock = jest.fn()
   render(
-    <RecoilRoot>
-      <ApiContext.Provider
-        value={{ setCurrentAccount: setCurrentAccountMock, getCurrentAccount: () => mockAccountModel() }}
-      >
-        <Router history={history}>
-          <SurveyList loadSurveyList={loadSurveyListSpy} />
-        </Router>
-      </ApiContext.Provider>
+    <RecoilRoot
+      initializeState={({ set }) =>
+        set(currentAccountState, {
+          setCurrentAccount: setCurrentAccountMock,
+          getCurrentAccount: () => mockAccountModel()
+        })
+      }
+    >
+      <Router history={history}>
+        <SurveyList loadSurveyList={loadSurveyListSpy} />
+      </Router>
     </RecoilRoot>
   )
 

@@ -1,11 +1,12 @@
-import { Header } from '@/presentation/components'
-import { ApiContext } from '@/presentation/contexts'
+import { Header, currentAccountState } from '@/presentation/components'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory, MemoryHistory } from 'history'
 import React from 'react'
 import { AccountModel } from '@/domain/models'
 import { mockAccountModel } from '@/domain/test'
+import { RecoilRoot } from 'recoil'
+
 type SystemUnderTestTypes = {
   history: MemoryHistory
   setCurrentAccountMock: (account: AccountModel) => void
@@ -15,11 +16,15 @@ const makeSystemUnderTest = (account = mockAccountModel()): SystemUnderTestTypes
   const history = createMemoryHistory({ initialEntries: ['/'] })
   const setCurrentAccountMock = jest.fn()
   render(
-    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock, getCurrentAccount: () => account }}>
+    <RecoilRoot
+      initializeState={({ set }) =>
+        set(currentAccountState, { setCurrentAccount: setCurrentAccountMock, getCurrentAccount: () => account })
+      }
+    >
       <Router history={history}>
         <Header />)
       </Router>
-    </ApiContext.Provider>
+    </RecoilRoot>
   )
   return {
     history,

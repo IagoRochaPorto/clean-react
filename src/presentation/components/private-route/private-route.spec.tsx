@@ -3,8 +3,9 @@ import { render } from '@testing-library/react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory, MemoryHistory } from 'history'
 import PrivateRoute from './private-route'
-import { ApiContext } from '@/presentation/contexts'
+import { currentAccountState } from '@/presentation/components'
 import { mockAccountModel } from '@/domain/test'
+import { RecoilRoot } from 'recoil'
 
 type SystemUnderTestTypes = {
   history: MemoryHistory
@@ -14,11 +15,15 @@ const makeSystemUnderTest = (account = mockAccountModel()): SystemUnderTestTypes
   const history = createMemoryHistory({ initialEntries: ['/'] })
 
   render(
-    <ApiContext.Provider value={{ getCurrentAccount: () => account }}>
+    <RecoilRoot
+      initializeState={({ set }) =>
+        set(currentAccountState, { getCurrentAccount: () => account, setCurrentAccount: null })
+      }
+    >
       <Router history={history}>
         <PrivateRoute />
       </Router>
-    </ApiContext.Provider>
+    </RecoilRoot>
   )
   return { history }
 }

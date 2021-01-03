@@ -1,11 +1,7 @@
-import React from 'react'
-import { render } from '@testing-library/react'
-import { Router } from 'react-router-dom'
 import { createMemoryHistory, MemoryHistory } from 'history'
 import PrivateRoute from './private-route'
-import { currentAccountState } from '@/presentation/components'
 import { mockAccountModel } from '@/domain/test'
-import { RecoilRoot } from 'recoil'
+import { renderWithHistory } from '@/presentation/test'
 
 type SystemUnderTestTypes = {
   history: MemoryHistory
@@ -14,17 +10,11 @@ type SystemUnderTestTypes = {
 const makeSystemUnderTest = (account = mockAccountModel()): SystemUnderTestTypes => {
   const history = createMemoryHistory({ initialEntries: ['/'] })
 
-  render(
-    <RecoilRoot
-      initializeState={({ set }) =>
-        set(currentAccountState, { getCurrentAccount: () => account, setCurrentAccount: null })
-      }
-    >
-      <Router history={history}>
-        <PrivateRoute />
-      </Router>
-    </RecoilRoot>
-  )
+  renderWithHistory({
+    history,
+    Page: PrivateRoute,
+    account
+  })
   return { history }
 }
 

@@ -1,10 +1,9 @@
-import React from 'react'
 import { SurveyItem } from '@/presentation/pages/survey-list/components'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { mockSurveyModel } from '@/domain/test'
 import { IconName } from '@/presentation/components'
-import { Router } from 'react-router-dom'
 import { createMemoryHistory, MemoryHistory } from 'history'
+import { renderWithHistory } from '@/presentation/test'
 
 type SystemUnderTestTypes = {
   history: MemoryHistory
@@ -12,14 +11,12 @@ type SystemUnderTestTypes = {
 
 const makeSystemUnderTest = (survey = mockSurveyModel()): SystemUnderTestTypes => {
   const history = createMemoryHistory({ initialEntries: ['/'] })
-  render(
-    <Router history={history}>
-      <SurveyItem survey={survey} />
-    </Router>
-  )
-  return {
-    history
-  }
+  renderWithHistory({
+    history,
+    Page: () => SurveyItem({ survey })
+  })
+
+  return { history }
 }
 
 describe('SurveyItem Component', () => {

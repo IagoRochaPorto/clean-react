@@ -4,7 +4,7 @@ import { LoginHeader, Footer, currentAccountState } from '@/presentation/compone
 import { Validation } from '@/presentation/protocols/validation'
 import { AddAccount } from '@/domain/usecases'
 import { Link, useHistory } from 'react-router-dom'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import { signupState, Input, SubmitButton, FormStatus } from './components'
 
 type Props = {
@@ -13,6 +13,7 @@ type Props = {
 }
 
 const Signup: React.FC<Props> = ({ validation, addAccount }: Props) => {
+  const resetSignupState = useResetRecoilState(signupState)
   const { setCurrentAccount } = useRecoilValue(currentAccountState)
   const history = useHistory()
   const [state, setState] = useRecoilState(signupState)
@@ -27,21 +28,11 @@ const Signup: React.FC<Props> = ({ validation, addAccount }: Props) => {
     }))
   }
 
-  useEffect(() => {
-    validate('name')
-  }, [state.name])
-
-  useEffect(() => {
-    validate('email')
-  }, [state.email])
-
-  useEffect(() => {
-    validate('password')
-  }, [state.password])
-
-  useEffect(() => {
-    validate('passwordConfirmation')
-  }, [state.passwordConfirmation])
+  useEffect(() => resetSignupState(), [])
+  useEffect(() => validate('name'), [state.name])
+  useEffect(() => validate('email'), [state.email])
+  useEffect(() => validate('password'), [state.password])
+  useEffect(() => validate('passwordConfirmation'), [state.passwordConfirmation])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()

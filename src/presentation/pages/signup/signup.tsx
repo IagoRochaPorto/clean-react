@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import Styles from './signup-styles.scss'
 import { LoginHeader, Footer } from '@/presentation/components'
 import { ApiContext } from '@/presentation/contexts'
